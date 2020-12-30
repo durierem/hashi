@@ -1,8 +1,7 @@
-from cell import Cell
-from cell import CellType
-from direction import Direction
-from grid import Grid
-from island import Island
+from lib.cell import *
+from lib.direction import Direction
+from lib.grid import Grid
+from lib.island import Island
 
 
 def main():

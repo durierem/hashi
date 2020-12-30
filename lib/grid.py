@@ -1,5 +1,4 @@
-from cell import Cell
-from cell import CellType
+from lib.cell import *
 
 class Grid:
     def __init__(self, cellMatrix):

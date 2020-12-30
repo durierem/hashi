@@ -1,5 +1,5 @@
 from enum import Enum
-from island import Island
+from lib.island import Island
 
 
 class CellType(Enum):

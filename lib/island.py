@@ -1,4 +1,4 @@
-from direction import Direction
+from lib.direction import Direction
 
 
 # Représente une île de Hashiwokakero.
