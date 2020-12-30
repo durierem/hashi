@@ -1,4 +1,5 @@
 from lib.cell import *
+from lib.cursor import *
 from lib.direction import Direction
 from lib.grid import Grid
 from lib.island import Island
@@ -13,12 +14,15 @@ def main():
     ]
 
     grid = Grid(matrix)
-    print("Grid width: " + str(grid.getWidth()))
-    print("Grid height: " + str(grid.getHeight()))
+    c = Cursor(grid)
 
-    # grid.display() OU print(grid) + redéfinition de Grid.__str__
+    # grid.display() OU print(grid) + redéfinition de Grid.__str__ ?
+    for cell in grid:
+        print(cell)
 
-    for c in grid:
+    print(c)
+    while (c.canMove(Direction.DOWN)):
+        c.move(Direction.DOWN)
         print(c)
 
 main()
