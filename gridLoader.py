@@ -29,11 +29,11 @@ class GridLoader:
 
 ## Test section
 
-def main():
-    print("Entrez le nom du fichier contenant la grille : ")
-    file = input()
-    gl = GridLoader(file)
-    grid = gl.load()
-    print(grid)
+# def main():
+#     print("Entrez le nom du fichier contenant la grille : ")
+#     file = input()
+#     gl = GridLoader(file)
+#     grid = gl.load()
+#     print(grid)
 
-main()
+# main()

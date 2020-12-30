@@ -3,23 +3,19 @@ from lib.cursor import *
 from lib.direction import Direction
 from lib.grid import Grid
 from lib.island import Island
+from gridLoader import GridLoader
 
 
 def main():
-    matrix = [
-        [Cell(), Cell(), Cell(Island(2))],
-        [Cell(Island(2)), Cell(), Cell(Island(4))],
-        [Cell(), Cell(), Cell(Island(1))],
-        [Cell(Island(1)), Cell(), Cell()],
-    ]
 
-    grid = Grid(matrix)
+    grid = Grid(GridLoader("grid.json").load())
     c = Cursor(grid)
 
-    # grid.display() OU print(grid) + redéfinition de Grid.__str__ ?
-    for cell in grid:
-        print(cell)
+    # Affiche les éléments de la grille, de gauche à droite, de haut en bas
+    for cursor in grid:
+        print(str(cursor.getCoord()) + " -> " + str(cursor.getCell()))
 
+    # Affiche les coordonnées d'un curseur qui bouge vers le bas
     print(c)
     while (c.canMove(Direction.DOWN)):
         c.move(Direction.DOWN)
