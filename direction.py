@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class Direction(Enum):
     LEFT = (0, -1)
     UP = (-1, 0)
@@ -8,7 +9,7 @@ class Direction(Enum):
 
     @staticmethod
     def opposite(direction):
-        if direction ==  Direction.LEFT:
+        if direction == Direction.LEFT:
             return Direction.RIGHT
         if direction == Direction.UP:
             return Direction.DOWN
