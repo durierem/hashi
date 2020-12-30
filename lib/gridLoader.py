@@ -1,6 +1,7 @@
 # Pour l'instant ne fait que lire un json.
 # Il manque la traduction en une matrice 
 
+from lib.grid import Grid
 import json
 
 class GridLoader:
@@ -12,7 +13,7 @@ class GridLoader:
         try:
             with open(self.__file) as f :
                 data = json.load(f)
-            print(data)
+            return data
         except:
             print("Error reading the grid")
 
@@ -24,7 +25,8 @@ def main():
     file = input()
     gl = GridLoader(file)
     grid = gl.load()
-    print(grid)
+    print(grid["grid"])
+    print(Grid(grid[grid]))
 
 
 main()
