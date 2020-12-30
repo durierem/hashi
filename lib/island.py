@@ -5,7 +5,7 @@ from lib.direction import Direction
 #
 # @inv
 #       0 <= totalBridges() <= maxBridges()
-#       0 <= getBridges <= MAX_BRIDGES_BY_DIRECTION
+#       0 <= getBridges() <= MAX_BRIDGES_BY_DIRECTION
 class Island:
 
     # CONSTANTES
@@ -30,7 +30,9 @@ class Island:
 
     def __str__(self):
         return (
-            "<Island: maxBridges="
+            "<Island: id="
+            + str(id(self))
+            + ", maxBridges="
             + str(self.getMaxBridges())
             + ", totalBridges="
             + str(self.getTotalBridges())

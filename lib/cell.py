@@ -15,7 +15,9 @@ class Cell:
 
     def __str__(self):
         return (
-            "<Cell: type="
+            "<Cell: id="
+            + str(id(self))
+            + ", type="
             + str(self.getType())
             + ", island="
             + str(self.getIsland())
