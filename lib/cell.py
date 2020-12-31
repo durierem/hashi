@@ -30,8 +30,11 @@ class Cell:
     def getIsland(self):
         return self.__island
 
-    def isType(cellType):
-        return self.getType() == cellType
-
     def setType(self, cellType):
         self.__type = cellType
+        if (cellType != CellType.ISLAND):
+            self.__island = None
+
+    def setIsland(self, island):
+        assert self.getType() == CellType.ISLAND
+        self.__island = island

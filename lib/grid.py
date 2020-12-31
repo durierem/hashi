@@ -1,5 +1,6 @@
 from lib.cell import *
 from lib.cursor import Cursor
+from lib.direction import Direction
 
 
 class Grid:
@@ -14,17 +15,17 @@ class Grid:
 
     def __iter__(self):
         self.__current = Cursor(self)
-        self.__line = 0
-        self.__col = 0
+        self.__x = 0
+        self.__y = 0
         return self
 
     def __next__(self):
-        if self.__line == self.getHeight():
+        if self.__y == self.getHeight():
             raise StopIteration
 
-        self.__current = Cursor(self, (self.__col, self.__line))
-        self.__col = 0 if self.__col + 1 == self.getWidth() else self.__col + 1 
-        self.__line += 1 if self.__col == 0 else 0
+        self.__current.setCoord(self.__x, self.__y)
+        self.__x = 0 if self.__x + 1 == self.getWidth() else self.__x + 1 
+        self.__y += 1 if self.__x == 0 else 0
 
         return self.__current
 
@@ -45,7 +46,7 @@ class Grid:
     def getCell(self, cursor=None):
         c = cursor if cursor != None else self.getCursor()
         x, y = c.getCoord()
-        return self.__matrix[x][y]
+        return self.__matrix[y][x]
 
     def getIsland(self, cursor=None):
         c = cursor if cursor != None else self.getCursor()

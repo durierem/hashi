@@ -13,7 +13,7 @@ def main():
 
     # Affiche les éléments de la grille, de gauche à droite, de haut en bas
     for cursor in grid:
-        print(str(cursor.getCoord()) + " -> " + str(cursor.getCell()))
+        print(str(cursor) + " -> " + str(cursor.getCell()))
 
     # Affiche les coordonnées d'un curseur qui bouge vers le bas
     print(c)

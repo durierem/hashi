@@ -5,7 +5,8 @@ from lib.direction import Direction
 #
 # @inv
 #       0 <= totalBridges() <= maxBridges()
-#       0 <= getBridges() <= MAX_BRIDGES_BY_DIRECTION
+#       for d in Direction:
+#           0 <= getBridges(d) <= MAX_BRIDGES_BY_DIRECTION
 class Island:
 
     # CONSTANTES
