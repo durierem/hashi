@@ -1,6 +1,7 @@
 from lib.cell import *
 from lib.cursor import Cursor
 from lib.direction import Direction
+from lib.drawer import Drawer
 
 
 class Grid:
@@ -112,3 +113,16 @@ class Grid:
 
         op = Direction.opposite(direction)
         return self.getIsland(c).getPossibleBridges(op)
+
+    #COMMANDE
+
+    def draw(self):
+        drawer = Drawer()
+        #cursor = Cursor(self)
+        for cursor in self:
+            currCell = cursor.getCell()
+            if currCell.getType() == CellType.ISLAND:
+                # print(currCell.getIsland().getMaxBridges())
+                drawer.addNode(currCell.getIsland().getMaxBridges())
+        drawer.visualize()
+
