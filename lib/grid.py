@@ -25,7 +25,7 @@ class Grid:
             raise StopIteration
 
         self.__current.setCoord(self.__x, self.__y)
-        self.__x = 0 if self.__x + 1 == self.getWidth() else self.__x + 1 
+        self.__x = 0 if self.__x + 1 == self.getWidth() else self.__x + 1
         self.__y += 1 if self.__x == 0 else 0
 
         return self.__current
@@ -67,10 +67,10 @@ class Grid:
                     for i3 in range(3):
                         buf[3] = i3
                         l.append(buf[:])
-        return l;
+        return l
 
     def __createBridges(self):
-        possibleBridges = self.__createPossibleBridges() # [:] ?
+        possibleBridges = self.__createPossibleBridges()  # [:] ?
 
         leftBridges = self.__findPossibleBridges(Direction.LEFT)
         upBridges = self.__findPossibleBridges(Direction.UP)
@@ -114,15 +114,14 @@ class Grid:
         op = Direction.opposite(direction)
         return self.getIsland(c).getPossibleBridges(op)
 
-    #COMMANDE
+    # COMMANDE
 
     def draw(self):
         drawer = Drawer()
-        #cursor = Cursor(self)
+        # cursor = Cursor(self)
         for cursor in self:
             currCell = cursor.getCell()
             if currCell.getType() == CellType.ISLAND:
                 # print(currCell.getIsland().getMaxBridges())
                 drawer.addNode(currCell.getIsland().getMaxBridges())
         drawer.visualize()
-

@@ -1,8 +1,3 @@
-from lib.cell import *
-from lib.cursor import *
-from lib.direction import Direction
-from lib.grid import Grid
-from lib.island import Island
 from lib.gridLoader import GridLoader
 
 

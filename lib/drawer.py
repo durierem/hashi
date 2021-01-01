@@ -1,11 +1,12 @@
-import networkx as nx 
-import matplotlib.pyplot as plt 
+import networkx as nx
+import matplotlib.pyplot as plt
+
 
 class Drawer:
     def __init__(self):
         self.nodes = []
-        self.edges = [] 
-    
+        self.edges = []
+
     def addNode(self, n):
         self.nodes.append(n)
 
@@ -17,6 +18,5 @@ class Drawer:
         G = nx.Graph()
         G.add_nodes_from(self.nodes)
         G.add_edges_from(self.edges)
-        nx.draw_networkx(G) 
-        plt.show() 
-        
+        nx.draw_networkx(G)
+        plt.show()
