@@ -1,6 +1,8 @@
-from lib.island import *
-from lib.grid import *
 import json
+
+from lib.cell import Cell
+from lib.grid import Grid
+from lib.island import Island
 
 class GridLoader:
     def __init__(self, file):
@@ -22,7 +24,7 @@ class GridLoader:
                     if x > 0:
                         column.append(Cell(Island(x)))
                 matrix.append(column)
-            return matrix
+            return Grid(matrix)
         except:
             print("Error reading the grid")
 
