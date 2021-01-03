@@ -52,7 +52,7 @@ class Island:
     def getPossibleBridges(self, direction):
         return min(
             self.getMaxBridges() - self.getTotalBridges(),
-            MAX_BRIDGES_BY_DIRECTION - self.getBridges(direction)
+            self.MAX_BRIDGES_BY_DIRECTION - self.getBridges(direction)
         )
 
     # COMMANDES
@@ -65,6 +65,7 @@ class Island:
     # OUTILS
 
     def __canAddBridge(self, direction):
-        isLegal = self.getNbBridges(direction) <= MAX_BRIDGES_BY_DIRECTION
+        isLegal = self.getBridges(direction) <= self.MAX_BRIDGES_BY_DIRECTION
         isNotFull = self.getTotalBridges() < self.getMaxBridges()
         return isLegal and isNotFull
+

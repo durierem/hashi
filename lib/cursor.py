@@ -16,7 +16,13 @@ class Cursor:
 
     def getCoord(self):
         return self.__coord
-
+    
+    def getCoordX(self):
+        return self.__coord[0]
+    
+    def getCoordY(self):
+        return self.__coord[1]
+    
     def getGrid(self):
         return self.__grid
 
@@ -36,7 +42,8 @@ class Cursor:
 
     # COMMANDES
 
-    def setCoord(self, x, y):
+    def setCoord(self, coord):
+        x,y = coord
         assert x <= self.getGrid().getWidth()
         assert y <= self.getGrid().getHeight()
         self.__coord = (x, y)
