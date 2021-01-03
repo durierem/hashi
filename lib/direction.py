@@ -1,6 +1,7 @@
 from enum import Enum
 
 
+# Modélise une direction.
 class Direction(Enum):
     LEFT = (-1, 0)
     UP = (0, -1)

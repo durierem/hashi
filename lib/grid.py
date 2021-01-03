@@ -1,21 +1,33 @@
-from lib.cell import *
+import copy
+
+from lib.cell import Cell
+from lib.cell import CellType
 from lib.cursor import Cursor
 from lib.direction import Direction
-import copy
 
 
-import copy
-
+# Modélise une grille de Hashiwokakero.
 class Grid:
 
     # CONSTRUCTEUR
 
+    # Créé un nouvelle grille à partir de la liste donnée.
+    #
+    # matrix - La réprésentation d'une grille de hashi par une liste à deux
+    #          dimensions dans laquelle, un 0 représente une case vide et un
+    #          chiffre strictement positif et le nombre de ponts associés.
     def __init__(self, matrix):
         self.__matrix = matrix
         self.__cursor = Cursor(self)
 
     # ÉNUMÉRATEUR
 
+    # Une grille peut être énuméré au moyen d'un curseur qui la parcours de
+    # bas en haut et de gauche à droite.
+    #
+    # Exemple :
+    #       for cursor in grid:
+    #           print(cursor.getCell())
     def __iter__(self):
         self.__current = Cursor(self)
         self.__x = 0
@@ -27,55 +39,66 @@ class Grid:
             raise StopIteration
 
         self.__current.setCoord((self.__x, self.__y))
-        self.__x = 0 if self.__x + 1 == self.getWidth() else self.__x + 1 
+        self.__x = 0 if self.__x + 1 == self.getWidth() else self.__x + 1
         self.__y += 1 if self.__x == 0 else 0
 
         return self.__current
 
     # REQUÊTES
 
+    # Renvoie la matrice associée à la grille.
     def getMatrix(self):
         self.__matrix
 
+    # Renvoie la largeur de la grille.
     def getWidth(self):
         return len(self.__matrix[0])
 
+    # Renvoie la hauteur de la grille.
     def getHeight(self):
         return len(self.__matrix)
 
+    # Renvoie le curseur princpal associé à la grille.
     def getCursor(self):
         return self.__cursor
 
+    # Renvoie la cellule pointée par un curseur.
+    #
+    # cursor - Le Cursor à utiliser. Si aucune curseur n'est précisé, le
+    #          curseur utilisé est celui renvoyé par getCursor() (défaut: None)
     def getCell(self, cursor=None):
         c = cursor if cursor != None else self.getCursor()
         x, y = c.getCoord()
         return self.__matrix[y][x]
 
+    # Renvoie l'île située sur la cellule pointée par un curseur.
+    #
+    # cursor - Le Cursor à utiliser. Si aucune curseur n'est précisé, le
+    #          curseur utilisé est celui renvoyé par getCursor() (défaut: None)
     def getIsland(self, cursor=None):
         c = cursor if cursor != None else self.getCursor()
         return self.getCell(c).getIsland()
-    
-    
-    
+
+    # Affiche la grille.
     def display(self):
-        c = Cursor(self,(0,0))
+        c = Cursor(self, (0, 0))
         if self.getCell(c).getType() == CellType.ISLAND:
-                print(str(self.getIsland(c).getMaxBridges()), end=",")
-                print("[", end="")
-                for d in Direction:
-                    print(str(self.getIsland(c).getBridges(d)),end=",")
-                print("]", end="")
-        if self.getCell(c).getType() == CellType.BRIDGE: 
-            print("-", end = "")
-        if self.getCell(c).getType() == CellType.EMPTY: 
-            print("x", end = "")
-        print(end = " ")
-        
+            print(str(self.getIsland(c).getMaxBridges()), end=",")
+            print("[", end="")
+            for d in Direction:
+                print(str(self.getIsland(c).getBridges(d)), end=",")
+            print("]", end="")
+        if self.getCell(c).getType() == CellType.BRIDGE:
+            print("-", end="")
+        if self.getCell(c).getType() == CellType.EMPTY:
+            print("x", end="")
+        print(end=" ")
+
         if c.canMove(Direction.RIGHT):
             c.move(Direction.RIGHT)
         else:
             if c.canMove(Direction.DOWN):
-                c.setCoord((0,c.getCoordY() + 1))
+                c.setCoord((0, c.getCoordY() + 1))
             else:
                 raise StopIteration
         while c.canMove(Direction.RIGHT) or c.canMove(Direction.DOWN):
@@ -83,37 +106,35 @@ class Grid:
                 print(str(self.getIsland(c).getMaxBridges()), end=",")
                 print("[", end="")
                 for d in Direction:
-                    print(str(self.getIsland(c).getBridges(d)),end=",")
+                    print(str(self.getIsland(c).getBridges(d)), end=",")
                 print("]", end="")
-            if self.getCell(c).getType() == CellType.BRIDGE: 
-                print("-", end = "")
-            if self.getCell(c).getType() == CellType.EMPTY: 
-                print("x", end = "")
-                
+            if self.getCell(c).getType() == CellType.BRIDGE:
+                print("-", end="")
+            if self.getCell(c).getType() == CellType.EMPTY:
+                print("x", end="")
+
             if c.canMove(Direction.RIGHT):
                 c.move(Direction.RIGHT)
-                print(end = " ")
+                print(end=" ")
             else:
                 if c.canMove(Direction.DOWN):
-                    c.setCoord((0,c.getCoordY() + 1))
+                    c.setCoord((0, c.getCoordY() + 1))
                     print()
                 else:
                     raise StopIteration
-                    
+
         if self.getCell(c).getType() == CellType.ISLAND:
-                print(str(self.getIsland(c).getMaxBridges()), end=",")
-                print("[", end="")
-                for d in Direction:
-                    print(str(self.getIsland(c).getBridges(d)),end=",")
-                print("]", end="")
-        if self.getCell(c).getType() == CellType.BRIDGE: 
-            print("-", end = "")
-        if self.getCell(c).getType() == CellType.EMPTY: 
-            print("x", end = "")
+            print(str(self.getIsland(c).getMaxBridges()), end=",")
+            print("[", end="")
+            for d in Direction:
+                print(str(self.getIsland(c).getBridges(d)), end=",")
+            print("]", end="")
+        if self.getCell(c).getType() == CellType.BRIDGE:
+            print("-", end="")
+        if self.getCell(c).getType() == CellType.EMPTY:
+            print("x", end="")
         return
-    
-   
-        
+
     # OUTILS
 
     def __createPossibleBridges(self):
@@ -128,22 +149,26 @@ class Grid:
                     for i3 in range(3):
                         buf[3] = i3
                         l.append(buf[:])
-        return l;
+        return l
 
     def __createGrids(self):
-        possibleBridges = self.__createPossibleBridges() # [:]
-        possibleBridges.remove([0,0,0,0])
+        possibleBridges = self.__createPossibleBridges()  # [:]
+        possibleBridges.remove([0, 0, 0, 0])
         cNeighbord = []
         j = 0
         for d in Direction:
             cNeighbord.append(self.__findPossibleNeighbor(d))
             op = Direction.opposite(d)
             if cNeighbord[j] != 0:
-                possibleBridges = [i for i in possibleBridges if i[j] <= self.getIsland(cNeighbord[j]).getPossibleBridges(op)]
-            else :
+                possibleBridges = [
+                    i
+                    for i in possibleBridges
+                    if i[j] <= self.getIsland(cNeighbord[j]).getPossibleBridges(op)
+                ]
+            else:
                 possibleBridges = [i for i in possibleBridges if i[j] <= 0]
             j += 1
-                
+
         possibleBridges = [
             i
             for i in possibleBridges
@@ -169,12 +194,10 @@ class Grid:
                 j += 1
             newGrid.append(g)
         return newGrid
-    
-    
 
     def __findPossibleNeighbor(self, direction):
         c = Cursor(self, self.getCursor().getCoord())
-        if c.canMove(direction) :
+        if c.canMove(direction):
             c.move(direction)
 
         while (
@@ -194,16 +217,20 @@ class Grid:
             or self.getCell(c).getType() == CellType.EMPTY
         ):
             return 0
-        
+
         return c
-    
+
     def __haveNextIsland(self, cursor=None):
-        c = Cursor(self,cursor.getCoord()) if cursor != None else Cursor(self,self.getCursor().getCoord())
+        c = (
+            Cursor(self, cursor.getCoord())
+            if cursor != None
+            else Cursor(self, self.getCursor().getCoord())
+        )
         if c.canMove(Direction.RIGHT):
             c.move(Direction.RIGHT)
         else:
             if c.canMove(Direction.DOWN):
-                c.setCoord((0,c.getCoordY() + 1))
+                c.setCoord((0, c.getCoordY() + 1))
             else:
                 return False
         while c.getCell().getType() != CellType.ISLAND:
@@ -211,20 +238,24 @@ class Grid:
                 c.move(Direction.RIGHT)
             else:
                 if c.canMove(Direction.DOWN):
-                    c.setCoord((0,c.getCoordY() + 1))
+                    c.setCoord((0, c.getCoordY() + 1))
                 else:
                     return False
-        if c.getCell().getIsland().getMaxBridges() - c.getCell().getIsland().getTotalBridges() == 0:
+        if (
+            c.getCell().getIsland().getMaxBridges()
+            - c.getCell().getIsland().getTotalBridges()
+            == 0
+        ):
             return self.__haveNextIsland(c)
         return True
-        
+
     def __findNextIsland(self, cursor=None):
         c = cursor if cursor != None else self.getCursor()
         if c.canMove(Direction.RIGHT):
             c.move(Direction.RIGHT)
         else:
             if c.canMove(Direction.DOWN):
-                c.setCoord((0,c.getCoordY() + 1))
+                c.setCoord((0, c.getCoordY() + 1))
             else:
                 raise StopIteration
         while c.getCell().getType() != CellType.ISLAND:
@@ -232,24 +263,28 @@ class Grid:
                 c.move(Direction.RIGHT)
             else:
                 if c.canMove(Direction.DOWN):
-                    c.setCoord((0,c.getCoordY() + 1))
+                    c.setCoord((0, c.getCoordY() + 1))
                 else:
                     raise StopIteration
-        if c.getCell().getIsland().getMaxBridges() - c.getCell().getIsland().getTotalBridges() == 0:
+        if (
+            c.getCell().getIsland().getMaxBridges()
+            - c.getCell().getIsland().getTotalBridges()
+            == 0
+        ):
             return self.__findNextIsland()
-    
+
     def solve(self):
         if self.getCell().getType() != CellType.ISLAND:
             if self.__haveNextIsland():
                 self.__findNextIsland()
-            else :
+            else:
                 return self
         grid = self.__createGrids()
         for i in grid:
             if not i.__haveNextIsland():
                 return i
             i.__findNextIsland()
-        while grid :
+        while grid:
             g = grid[0]
             del grid[0]
             print(g.getCursor())
