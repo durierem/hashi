@@ -4,6 +4,8 @@ from lib.direction import Direction
 import copy
 
 
+import copy
+
 class Grid:
 
     # CONSTRUCTEUR
@@ -55,7 +57,7 @@ class Grid:
     
     
     
-    def showRepresentationOfGraphe(self):
+    def display(self):
         c = Cursor(self,(0,0))
         if self.getCell(c).getType() == CellType.ISLAND:
                 print(str(self.getIsland(c).getMaxBridges()), end=",")
@@ -110,23 +112,7 @@ class Grid:
             print("x", end = "")
         return
     
-    def solve(self):
-        if self.getCell().getType() != CellType.ISLAND:
-            if self.__haveNextIsland():
-                self.__findNextIsland()
-            else :
-                return self
-        grid = self.__createGrids()
-        while grid :
-            g = grid[0]
-            del grid[0]
-            buf = g.__createGrids()
-            for i in buf:
-                if not i.__haveNextIsland():
-                    return i
-                i.__findNextIsland()
-                grid.append(i)
-        return []
+   
         
     # OUTILS
 
@@ -145,7 +131,8 @@ class Grid:
         return l;
 
     def __createGrids(self):
-        possibleBridges = self.__createPossibleBridges() # [:] 
+        possibleBridges = self.__createPossibleBridges() # [:]
+        possibleBridges.remove([0,0,0,0])
         cNeighbord = []
         j = 0
         for d in Direction:
@@ -163,6 +150,7 @@ class Grid:
             if sum(i)
             == self.getIsland().getMaxBridges() - self.getIsland().getTotalBridges()
         ]
+        print(possibleBridges)
         newGrid = []
         for i in possibleBridges:
             g = copy.deepcopy(self)
@@ -218,7 +206,7 @@ class Grid:
                 c.setCoord((0,c.getCoordY() + 1))
             else:
                 return False
-        while c.getCell().getType() != CellType.ISLAND :
+        while c.getCell().getType() != CellType.ISLAND:
             if c.canMove(Direction.RIGHT):
                 c.move(Direction.RIGHT)
             else:
@@ -226,6 +214,8 @@ class Grid:
                     c.setCoord((0,c.getCoordY() + 1))
                 else:
                     return False
+        if c.getCell().getIsland().getMaxBridges() - c.getCell().getIsland().getTotalBridges() == 0:
+            return self.__haveNextIsland(c)
         return True
         
     def __findNextIsland(self, cursor=None):
@@ -237,7 +227,7 @@ class Grid:
                 c.setCoord((0,c.getCoordY() + 1))
             else:
                 raise StopIteration
-        while self.getCell().getType() != CellType.ISLAND :
+        while c.getCell().getType() != CellType.ISLAND:
             if c.canMove(Direction.RIGHT):
                 c.move(Direction.RIGHT)
             else:
@@ -245,4 +235,31 @@ class Grid:
                     c.setCoord((0,c.getCoordY() + 1))
                 else:
                     raise StopIteration
-        return
+        if c.getCell().getIsland().getMaxBridges() - c.getCell().getIsland().getTotalBridges() == 0:
+            return self.__findNextIsland()
+    
+    def solve(self):
+        if self.getCell().getType() != CellType.ISLAND:
+            if self.__haveNextIsland():
+                self.__findNextIsland()
+            else :
+                return self
+        grid = self.__createGrids()
+        for i in grid:
+            if not i.__haveNextIsland():
+                return i
+            i.__findNextIsland()
+        while grid :
+            g = grid[0]
+            del grid[0]
+            print(g.getCursor())
+            buf = g.__createGrids()
+            for i in buf:
+                i.display()
+                print()
+                print()
+                if not i.__haveNextIsland():
+                    return i
+                i.__findNextIsland()
+                grid.append(i)
+        return []
