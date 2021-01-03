@@ -62,6 +62,10 @@ class Island:
             self.MAX_BRIDGES_BY_DIRECTION - self.getBridges(direction),
         )
 
+    # Détermine si un île est pleine.
+    def isFull(self):
+        return self.getTotalBridges() == self.getMaxBridges()
+
     # COMMANDES
 
     # Ajoute un pont à l'île dans une direction.

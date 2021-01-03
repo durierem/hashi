@@ -91,4 +91,4 @@ class Cursor:
 
     # Déplace le curseur sur la première cellule de la ligne du dessous.
     def nextLine(self):
-        self.__coord = (0, self.getCoordY + 1)
+        self.__coord = (0, self.getCoordY() + 1)
