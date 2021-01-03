@@ -181,14 +181,13 @@ class Grid:
             if sum(i)
             == self.getIsland().getMaxBridges() - self.getIsland().getTotalBridges()
         ]
-        print(possibleBridges)
         newGrid = []
         for i in possibleBridges:
             g = copy.deepcopy(self)
             j = 0
             for d in Direction:
                 op = Direction.opposite(d)
-                if cNeighbord[j] != 0:
+                if i[j] != 0:
                     for k in range(i[j]):
                         g.getIsland().addBridge(d)
                         g.getIsland(cNeighbord[j]).addBridge(op)
@@ -286,13 +285,10 @@ class Grid:
         while grid :
             g = grid[0]
             del grid[0]
-            print(g.getCursor())
             buf = g.__createGrids()
             for i in buf:
-                i.display()
-                print()
-                print()
                 if not i.__haveNextIsland():
+                    print("Un super résultat que voila:")
                     return i
                 i.__findNextIsland()
                 grid.append(i)
