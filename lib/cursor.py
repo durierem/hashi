@@ -19,6 +19,21 @@ class Cursor:
     def __str__(self):
         return "<Cursor: coord=" + str(self.__coord) + ">"
 
+    # Redéfinit l'opérateur "==" pour les Cursor.
+    #
+    # Deux curseurs sont égaux si ils sont associés à la même grille et ont les
+    # mêmes coordonnées.
+    def __eq__(self, obj):
+        return (
+            type(obj) == Cursor
+            and obj.getGrid() == self.getGrid()
+            and obj.getCoord() == self.getCoord()
+        )
+
+    # Redéfinit l'opérateur "!=" pour les Cursor.
+    def __ne__(self, obj):
+        return not self == obj
+
     # Renvoie le Tuple de coordonnées (x, y) indiquant la position du curseur.
     def getCoord(self):
         return self.__coord
@@ -63,15 +78,15 @@ class Cursor:
     # coord - Le Tuple de coordonnées auxquelles déplacer le curseur.
     def setCoord(self, coord):
         x, y = coord
-        assert x <= self.getGrid().getWidth(), "Coordonnée X incorrecte"
-        assert y <= self.getGrid().getHeight(), "Coordonnée Y incorrecte"
+        assert x <= self.getGrid().getWidth(), "Invalid X coordinate"
+        assert y <= self.getGrid().getHeight(), "Invalid Y coordinate"
         self.__coord = (x, y)
 
     # Déplace le curseur d'une cellule dans une direction.
     #
     # direction - La Direction dans laquelle déplacer le curseur.
     def move(self, direction):
-        assert self.canMove(direction), "Impossible de déplacer le curseur"
+        assert self.canMove(direction), "Invalid direction"
         self.__coord = Direction.add(direction, self.__coord)
 
     # Déplace le curseur sur la première cellule de la ligne du dessous.

@@ -36,9 +36,9 @@ class Cell:
             "<Cell: id="
             + str(id(self))
             + ", type="
-            + str(self.getType())
+            + str(self.__type)
             + ", island="
-            + str(self.getIsland())
+            + str(self.__island)
             + ">"
         )
 

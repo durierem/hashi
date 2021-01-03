@@ -34,6 +34,18 @@ class Grid:
 
     # REQUÊTES
 
+    def __str__(self):
+        return (
+            "<Grid: id="
+            + str(id(self))
+            + ", cursor="
+            + str(self.__cursor)
+            + ", matrix="
+            + str(self.__matrix)
+            + ">"
+            )
+
+    # Renvoie la matrice associée à la grille.
     def getMatrix(self):
         self.__matrix
 
@@ -58,7 +70,23 @@ class Grid:
     
     
     def display(self):
-        c = Cursor(self,(0,0))
+        # result = ""
+        # for c in self:
+        #     if (c.getCell().getType() == CellType.ISLAND):
+        #         result += str(c.getCell().getIsland().getMaxBridges()) + " "
+        #     elif (c.getCell().getType() == CellType.BRIDGE):
+        #         result += "+ "
+        #     elif (c.getCell().getType() == CellType.DOUBLE_BRIDGE):
+        #         result += "# "
+        #     else:
+        #         result += "  "
+
+        #     if (not c.canMove(Direction.RIGHT)):
+        #         result += "\n"
+
+        # print(result)
+        # return
+        c = Cursor(self, (0, 0))
         if self.getCell(c).getType() == CellType.ISLAND:
                 print(str(self.getIsland(c).getMaxBridges()), end=",")
                 print("[", end="")
@@ -130,6 +158,9 @@ class Grid:
                         l.append(buf[:])
         return l;
 
+    # Renvoie une liste composée de nouvelles grilles construites à partir de
+    # la grille actuelle en ajoutant les ponts posibles à l'île pointée par
+    # le curseur de la grille actuelle.
     def __createGrids(self):
         possibleBridges = self.__createPossibleBridges() # [:]
         possibleBridges.remove([0,0,0,0])
@@ -172,6 +203,9 @@ class Grid:
     
     
 
+    # S'il existe une île pouvant être reliée à celle pointée par le curseur
+    # actuel dans la direction donnée, renvoie un curseur pointant sur ses
+    # cooronnées. Sinon renvoie 0.
     def __findPossibleNeighbor(self, direction):
         c = Cursor(self, self.getCursor().getCoord())
         if c.canMove(direction) :
