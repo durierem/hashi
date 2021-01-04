@@ -3,9 +3,12 @@ import copy
 from lib.cell import *
 from lib.cursor import Cursor
 from lib.direction import Direction
+from lib.island import Island
 
 # Modélise une grille de Hashiwokakero.
 class Grid:
+
+    allBridgeCombinations = None
 
     # CONSTRUCTEUR
 
@@ -17,6 +20,7 @@ class Grid:
     def __init__(self, matrix):
         self.__matrix = matrix
         self.__cursor = Cursor(self)
+        self.allBridgeCombinations = self.__createAllBridgeCombinations()
 
     # ÉNUMÉRATEUR
 
@@ -95,75 +99,116 @@ class Grid:
             if not c.canMove(Direction.RIGHT):
                 print("")
 
+    # Renvoie la grille résolue ou None s'il n'existe pas de solution.
+    def solve(self):
+        if self.getCell().getType() != CellType.ISLAND:
+            if self.__hasNextIsland():
+                self.__goToNextIsland()
+            else:
+                return self
+        grid = self.__createGrids()
+        for i in grid:
+            if not i.__hasNextIsland():
+                return i
+            i.__goToNextIsland()
+        while grid:
+            g = grid[0]
+            del grid[0]
+            buf = g.__createGrids()
+            for i in buf:
+                if not i.__hasNextIsland():
+                    return i
+                i.__goToNextIsland()
+                grid.append(i)
+        return None
+
     # OUTILS
 
-    def __createPossibleBridges(self):
+    def __createAllBridgeCombinations(self):
         l = []
         for i0 in range(3):
-            buf = [0, 0, 0, 0]
-            buf[0] = i0
+            buf = {
+                Direction.LEFT: 0,
+                Direction.UP: 0,
+                Direction.RIGHT: 0,
+                Direction.DOWN: 0,
+            }
+            buf[Direction.LEFT] = i0
             for i1 in range(3):
-                buf[1] = i1
+                buf[Direction.UP] = i1
                 for i2 in range(3):
-                    buf[2] = i2
+                    buf[Direction.RIGHT] = i2
                     for i3 in range(3):
-                        buf[3] = i3
-                        l.append(buf[:])
+                        buf[Direction.DOWN] = i3
+                        l.append(buf.copy())
         return l
 
     # Renvoie une liste composée de nouvelles grilles construites à partir de
     # la grille actuelle en ajoutant les ponts posibles à l'île pointée par
     # le curseur de la grille actuelle.
     def __createGrids(self):
-        possibleBridges = self.__createPossibleBridges()  # [:]
-        cNeighbord = []
-        j = 0
+        combinations = self.allBridgeCombinations.copy()
+
+        # Les curseurs vers les îles voisines de l'île courante.
+        neighborCursors = {
+            Direction.LEFT: None,
+            Direction.UP: None,
+            Direction.RIGHT: None,
+            Direction.DOWN: None,
+        }
+
+        # ...
         for d in Direction:
-            cNeighbord.append(self.__findPossibleNeighbor(d))
+            neighborCursors[d] = self.__findNeighbor(d)
             op = Direction.opposite(d)
-            if cNeighbord[j] != 0:
-                possibleBridges = [
+            if neighborCursors[d] != None:
+                combinations = [
                     i
-                    for i in possibleBridges
-                    if i[j] <= self.getIsland(cNeighbord[j]).getPossibleBridges(op)
+                    for i in combinations
+                    if i[d] <= self.getIsland(neighborCursors[d]).getPossibleBridges(op)
                 ]
             else:
-                possibleBridges = [i for i in possibleBridges if i[j] <= 0]
-            j += 1
+                combinations = [i for i in combinations if i[d] <= 0]
 
-        possibleBridges = [
+        # ...
+        combinations = [
             i
-            for i in possibleBridges
-            if sum(i)
+            for i in combinations
+            if sum(i.values())
             == self.getIsland().getMaxBridges() - self.getIsland().getTotalBridges()
         ]
-        newGrid = []
-        for i in possibleBridges:
+
+        # ...
+        newGrids = []
+        for i in combinations:
             g = copy.deepcopy(self)
-            j = 0
             for d in Direction:
                 op = Direction.opposite(d)
-                if i[j] != 0:
-                    for k in range(i[j]):
+                if i[d] != 0:
+                    for k in range(i[d]):
                         g.getIsland().addBridge(d)
-                        g.getIsland(cNeighbord[j]).addBridge(op)
+                        g.getIsland(neighborCursors[d]).addBridge(op)
                     c = Cursor(g, self.getCursor().getCoord())
-                    dual = True if c.getCell().getIsland().getBridges(d) == 2 else False
+                    isDual = (
+                        True
+                        if c.getCell().getIsland().getBridges(d)
+                        == Island.MAX_BRIDGES_BY_DIRECTION
+                        else False
+                    )
                     c.move(d)
                     while g.getCell(c).getType() != CellType.ISLAND:
                         g.getCell(c).setType(CellType.BRIDGE)
                         g.getCell(c).setDirection(d)
-                        if dual:
+                        if isDual:
                             g.getCell(c).setDual()
                         c.move(d)
-                j += 1
-            newGrid.append(g)
-        return newGrid
+            newGrids.append(g)
+        return newGrids
 
     # S'il existe une île pouvant être reliée à celle pointée par le curseur
     # actuel dans la direction donnée, renvoie un curseur pointant sur ses
-    # cooronnées. Sinon renvoie 0.
-    def __findPossibleNeighbor(self, direction):
+    # cooronnées. Sinon renvoie None.
+    def __findNeighbor(self, direction):
         c = Cursor(self, self.getCursor().getCoord())
         if c.canMove(direction):
             c.move(direction)
@@ -183,11 +228,11 @@ class Grid:
             or self.getCell(c).getType() == CellType.BRIDGE
             or self.getCell(c).getType() == CellType.EMPTY
         ):
-            return 0
+            return None
 
         return c
 
-    def __haveNextIsland(self, cursor=None):
+    def __hasNextIsland(self, cursor=None):
         c = (
             Cursor(self, cursor.getCoord())
             if cursor != None
@@ -213,7 +258,7 @@ class Grid:
             - c.getCell().getIsland().getTotalBridges()
             == 0
         ):
-            return self.__haveNextIsland(c)
+            return self.__hasNextIsland(c)
         return True
 
     def __goToNextIsland(self):
@@ -245,26 +290,3 @@ class Grid:
 
         if c.getCell().getIsland().isFull():
             return self.__goToNextIsland()
-
-    def solve(self):
-        if self.getCell().getType() != CellType.ISLAND:
-            if self.__haveNextIsland():
-                self.__goToNextIsland()
-            else:
-                return self
-        grid = self.__createGrids()
-        for i in grid:
-            if not i.__haveNextIsland():
-                return i
-            i.__goToNextIsland()
-        while grid:
-            g = grid[0]
-            del grid[0]
-            buf = g.__createGrids()
-            for i in buf:
-                if not i.__haveNextIsland():
-                    print("Un super résultat que voila:")
-                    return i
-                i.__goToNextIsland()
-                grid.append(i)
-        return []

@@ -64,12 +64,9 @@ class Cell:
         if self.__type == CellType.ISLAND:
             print(" " + str(self.__island.getMaxBridges()) + " ", end="")
         elif self.__type == CellType.BRIDGE:
-            if (
-                self.__direction == Direction.RIGHT
-                or self.__direction == Direction.LEFT
-            ):
+            if self.__direction in [Direction.RIGHT, Direction.LEFT]:
                 print("═══" if self.__dual else "───", end="")
-            elif self.__direction == Direction.UP or self.__direction == Direction.DOWN:
+            elif self.__direction in [Direction.UP, Direction.DOWN]:
                 print(" ║ " if self.__dual else " │ ", end="")
         elif self.__type == CellType.EMPTY:
             print("   ", end="")

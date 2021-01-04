@@ -9,12 +9,14 @@ def main():
         exit(1)
 
     grid = GridLoader(sys.argv[1]).load()
-    solved = grid.solve()
-    if solved == None:
+
+    solution = grid.solve()
+    if solution == None:
         print("No solution found")
         exit(1)
     else:
-        solved.display()
+        print("A great result here is:")
+        solution.display()
 
 
 main()
