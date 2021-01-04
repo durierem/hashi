@@ -101,25 +101,27 @@ class Grid:
 
     # Renvoie la grille résolue ou None s'il n'existe pas de solution.
     def solve(self):
+        # Si aucune île dans le graphe, le graphe est solution de lui-même
         if self.getCell().getType() != CellType.ISLAND:
             if self.__hasNextIsland():
                 self.__goToNextIsland()
             else:
                 return self
-        grid = self.__createGrids()
-        for i in grid:
-            if not i.__hasNextIsland():
-                return i
-            i.__goToNextIsland()
-        while grid:
-            g = grid[0]
-            del grid[0]
+
+        # ALGOOOO
+        grids = [self]
+        while grids:
+            g = grids.pop(0)
             buf = g.__createGrids()
             for i in buf:
                 if not i.__hasNextIsland():
-                    return i
+                    if i.__isConnected():
+                        return i
+                    else:
+                        break
                 i.__goToNextIsland()
-                grid.append(i)
+                grids.append(i)
+
         return None
 
     # OUTILS
@@ -208,8 +210,8 @@ class Grid:
     # S'il existe une île pouvant être reliée à celle pointée par le curseur
     # actuel dans la direction donnée, renvoie un curseur pointant sur ses
     # cooronnées. Sinon renvoie None.
-    def __findNeighbor(self, direction):
-        c = Cursor(self, self.getCursor().getCoord())
+    def __findNeighbor(self, direction, cursor=None):
+        c = Cursor(self,cursor.getCoord()) if cursor != None else Cursor(self,self.getCursor().getCoord())
         if c.canMove(direction):
             c.move(direction)
 
@@ -217,7 +219,7 @@ class Grid:
             self.getCell(c).getType() != CellType.ISLAND
             and (
                 self.getCell(c).getType() != CellType.BRIDGE
-                or self.getIsland().getBridges(direction) == 1
+                or self.getIsland().getBridges(direction) > 0
             )
             and c.canMove(direction)
         ):
@@ -290,3 +292,58 @@ class Grid:
 
         if c.getCell().getIsland().isFull():
             return self.__goToNextIsland()
+
+    def __isConnected(self):
+            vertex = []
+            edge = []
+            for c in self:
+                if c.getCell().getType() == CellType.ISLAND:
+                    buf = Cursor(self, c.getCoord())
+                    vertex.append(buf)
+                    for d in Direction:
+                        if c.getCell().getIsland().getBridges(d) != 0:
+                            c2 = self.__findNeighbor(d, c)
+                            if c2 != None:
+                                buf = Cursor(self,c.getCoord())
+                                if edge.count((buf,c2)) == 0 and edge.count((c2,buf)) == 0:
+                                    edge.append((buf,c2))
+            father = []
+            for i in vertex:
+                #foretDiscrete()
+                father.append(-1)
+            for e in edge:
+                x,y = e
+                x = vertex.index(x)
+                y = vertex.index(y)
+                #Trouverrapide(x, r1, pere)
+                i = x
+                while father[i] > -1:
+                    i = father[i]
+                r1 = i
+                i = x
+                while father[i] > -1:
+                    j = i
+                    i = father[i]
+                    father[j] = r1
+                #Trouverrapide(x, r2, pere)
+                i = y
+                while father[i] > -1:
+                    i = father[i]
+                r2 = i
+                i = y
+                while father[i] > -1:
+                    j = i
+                    i = father[i]
+                    father[j] = r2
+                #Reunirpondere(r1,r2,pere)
+                if r1 != r2 :
+                    if father[r1] > father[r2]:
+                        father[r2] = father[r1] + father[r2]
+                        father[r1] = r2
+                    else:
+                        father[r1] = father[r1] + father[r2]
+                        father[r2] = r1
+                    print(father)
+
+            print(len(edge))
+            return father.count(-len(father)) == 1
