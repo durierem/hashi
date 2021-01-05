@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 import sys
 
@@ -6,19 +6,19 @@ from lib.gridLoader import GridLoader
 
 
 def main():
-    if len(sys.argv) != 2:
-        print("Usage: ./hashi <grid>.json")
+    if len(sys.argv) < 2:
+        print("Usage: ./hashi GRID...")
         exit(1)
 
-    grid = GridLoader(sys.argv[1]).load()
-
-    solution = grid.solve()
-    if solution == None:
-        print("No solution found")
-        exit(1)
-    else:
-        print("A great result, here is:")
-        solution.display()
+    for arg in sys.argv[1:]:
+        grid = GridLoader(arg).load()
+        solution = grid.solve()
+        if solution == None:
+            print(arg + ": no solution found")
+        else:
+            print(arg + ": a result, here is")
+            solution.display()
+            print("")
 
 
 main()

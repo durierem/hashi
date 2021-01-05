@@ -26,5 +26,5 @@ class GridLoader:
                 matrix.append(column)
             return Grid(matrix)
         except Exception as e:
-            print("Error reading '" + self.__file + "': " + str(e))
+            print(e)
             exit(1)

@@ -89,13 +89,19 @@ class Cell:
     #
     # island - L'Island à associer à la cellule.
     def setIsland(self, island):
-        assert self.getType() == CellType.ISLAND, "cell type is not 'CellType.ISLAND'"
+        assert (
+            self.getType() == CellType.ISLAND
+        ), "cell type is not 'CellType.ISLAND'"
         self.__island = island
 
     def setDual(self):
-        assert self.getType() == CellType.BRIDGE, "cell type is not 'CellType.BRIDGE'"
+        assert (
+            self.getType() == CellType.BRIDGE
+        ), "cell type is not 'CellType.BRIDGE'"
         self.__dual = True
 
     def setDirection(self, direction):
-        assert self.getType() == CellType.BRIDGE, "cell type is not 'CellType.BRIDGE'"
+        assert (
+            self.getType() == CellType.BRIDGE
+        ), "cell type is not 'CellType.BRIDGE'"
         self.__direction = direction

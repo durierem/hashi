@@ -96,7 +96,7 @@ class Grid:
     def display(self):
         for c in self:
             c.getCell().display()
-            if not c.canMove(Direction.RIGHT):
+            if c.getCoordX() == self.getWidth() - 1:
                 print("")
 
     # Renvoie la grille résolue ou None s'il n'existe pas de solution.
@@ -167,7 +167,10 @@ class Grid:
                 combinations = [
                     i
                     for i in combinations
-                    if i[d] <= self.getIsland(neighborCursors[d]).getPossibleBridges(op)
+                    if i[d]
+                    <= self.getIsland(neighborCursors[d]).getPossibleBridges(
+                        op
+                    )
                 ]
             else:
                 combinations = [i for i in combinations if i[d] <= 0]
@@ -177,7 +180,8 @@ class Grid:
             i
             for i in combinations
             if sum(i.values())
-            == self.getIsland().getMaxBridges() - self.getIsland().getTotalBridges()
+            == self.getIsland().getMaxBridges()
+            - self.getIsland().getTotalBridges()
         ]
 
         # ...
@@ -207,9 +211,11 @@ class Grid:
             newGrids.append(g)
         return newGrids
 
-    # S'il existe une île pouvant être reliée à celle pointée par le curseur
-    # actuel dans la direction donnée, renvoie un curseur pointant sur ses
-    # cooronnées. Sinon renvoie None.
+    # S'il existe une île pouvant être reliée à la cellule pointée par
+    # 'cursor' dans la 'direction' donnée, renvoie un curseur pointant sur les
+    # coordonnées de cette île. Sinon renvoie None.
+    # Si aucun curseur n'est précisé, celui de la grille est utilisé.
+    # Dans tout les cas, le curseur donné n'est pas modifié.
     def __findNeighbor(self, direction, cursor=None):
         c = Cursor(self,cursor.getCoord()) if cursor != None else Cursor(self,self.getCursor().getCoord())
         if c.canMove(direction):
