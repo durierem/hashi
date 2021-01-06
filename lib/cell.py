@@ -68,6 +68,7 @@ class Cell:
 
     # COMMANDES
 
+    #
     def display(self):
         if self.__type == CellType.ISLAND:
             print(" " + str(self.__island.getMaxBridges()) + " ", end="")
@@ -78,6 +79,15 @@ class Cell:
                 print(" ║ " if self.__dual else " │ ", end="")
         elif self.__type == CellType.EMPTY:
             print("   ", end="")
+
+    # Affiche le poid de la cellule.
+    def display_value(self):
+        if self.isIsland():
+            print(" " + str(self.__island.getMaxBridges()) + " ", end="")
+        elif self.isBridge():
+            print(" -1 " if self.__dual == False else " -2 ", end="")
+        else:
+            print(" 0 ", end="")
 
     # Modifie le type de la cellule.
     #

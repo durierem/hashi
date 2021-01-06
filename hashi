@@ -14,11 +14,13 @@ def main():
         grid = GridLoader.load(arg)
 
         print("Trying to solve: " + arg + "...\n")
-        grid.display()
+        grid.display_matrix()
         print("")
 
         solution = grid.solve()
-        if solution == None:
+        if solution == False:
+            print("No Island in the Grid.")
+        elif solution == None:
             print("No solution found.")
         else:
             print("A great result, here is:\n")

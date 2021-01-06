@@ -91,12 +91,19 @@ class Grid:
             if c.getCoordX() == self.getWidth() - 1:
                 print("")
 
+    
+    def display_matrix(self):
+        for c in self:
+            c.getCell().display_value()
+            if c.getCoordX() == self.getWidth() - 1:
+                print("")
+
     # Renvoie la grille résolue ou None s'il n'existe pas de solution.
     def solve(self):
         # Si aucune île dans le graphe, le graphe est solution de lui-même.
-        if self.getCell().getType() != CellType.ISLAND:
+        if not self.getCell().isIsland():
             if not self.__hasNextIsland():
-                return self
+                return False
         
         # L'algorithme nécessite de placer le curseur sur la première île.
         self.__goToNextIsland()
@@ -162,12 +169,8 @@ class Grid:
             op = Direction.opposite(d)
             if neighborCursors[d] != None:
                 combinations = [
-                    i
-                    for i in combinations
-                    if i[d]
-                    <= self.getIsland(neighborCursors[d]).getPossibleBridges(
-                        op
-                    )
+                    i for i in combinations
+                    if i[d] <= self.getIsland(neighborCursors[d]).getPossibleBridges(op)
                 ]
             else:
                 combinations = [i for i in combinations if i[d] <= 0]
@@ -176,9 +179,7 @@ class Grid:
         combinations = [
             i
             for i in combinations
-            if sum(i.values())
-            == self.getIsland().getMaxBridges()
-            - self.getIsland().getTotalBridges()
+            if sum(i.values()) == self.getIsland().getMaxBridges() - self.getIsland().getTotalBridges()
         ]
         # ...
         newGrids = []
@@ -207,8 +208,6 @@ class Grid:
             newGrids.append(g)
         return newGrids
 
-
-
     # S'il existe une île pouvant être reliée à la cellule pointée par
     # 'cursor' dans la 'direction' donnée, renvoie un curseur pointant sur les
     # coordonnées de cette île. Sinon renvoie None.
@@ -228,8 +227,6 @@ class Grid:
             return None
         return c
 
-
-
     def __hasNextIsland(self, cursor=None):
         c = copy.copy(cursor if cursor != None else self.getCursor())
         while True:
@@ -239,10 +236,8 @@ class Grid:
                 return False
             if c.getCell().isIsland():
                 if c.getCell().getIsland().isFull():
-                    return self.__hasNextIsland(c)
+                    continue
                 return True
-
-
 
     def __goToNextIsland(self):
         self.getCursor().goToNextIsland()
