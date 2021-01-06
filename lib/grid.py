@@ -237,10 +237,11 @@ class Grid:
                 c.goToNextCell()
             except EndOfGridException:
                 return False
-            if c.getCell().getType() == CellType.ISLAND:
+            if c.getCell().isIsland():
                 if c.getCell().getIsland().isFull():
                     return self.__hasNextIsland(c)
                 return True
+
 
 
     def __goToNextIsland(self):

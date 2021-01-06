@@ -58,6 +58,8 @@ class Cursor:
     def getCell(self):
         return self.getGrid().getCell(self)
 
+
+
     # Représente la capacité du curseur à se déplacer dans une direction.
     #
     # Le curseur ne peut pas se déplacer dans une direction donnée lorsqu'il
@@ -65,15 +67,12 @@ class Cursor:
     #
     # direction - La Direction a tester.
     def canMove(self, direction):
-        x, y = self.__coord
-        width = self.getGrid().getWidth()
-        height = self.getGrid().getHeight()
-        return (
-            not (direction == Direction.LEFT and x == 0)
-            and not (direction == Direction.UP and y == 0)
-            and not (direction == Direction.RIGHT and x == width - 1)
-            and not (direction == Direction.DOWN and y == height - 1)
-        )
+        x, y = Direction.add(direction, self.__coord) 
+        if x < 0 or x >= self.getGrid().getWidth(): return False
+        if y < 0 or y >= self.getGrid().getHeight(): return False 
+        return True
+
+
 
     # COMMANDES
 
