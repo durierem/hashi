@@ -12,11 +12,14 @@ def main():
 
     for arg in sys.argv[1:]:
         grid = GridLoader(arg).load()
+        print("Trying to solve : " + arg + "\n")
+        grid.display()
         solution = grid.solve()
+        print("")
         if solution == None:
-            print(arg + ": no solution found")
+            print("No solution found.")
         else:
-            print(arg + ": a result, here is")
+            print("A result, here is :\n")
             solution.display()
             print("")
 

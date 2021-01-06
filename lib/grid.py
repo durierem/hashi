@@ -99,8 +99,6 @@ class Grid:
             if c.getCoordX() == self.getWidth() - 1:
                 print("")
 
-
-
     # OUTILS
 
     def __createAllBridgeCombinations(self):
@@ -378,9 +376,7 @@ class Grid:
                 if not i.__hasNextIsland():
                     if i.__isConnected():
                         return i
-                    else:
-                        i.display()
-                        break
+                    break
                 i.__goToNextIsland()
                 grids.append(i)
 
