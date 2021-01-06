@@ -6,14 +6,10 @@ from lib.island import Island
 
 
 class GridLoader:
-    def __init__(self, file):
-        assert isinstance(file, str)
-        self.__file = file
-
-    # Retourne la grille contenue dans file
-    def load(self):
+    @staticmethod
+    def load(file):
         try:
-            with open(self.__file) as f:
+            with open(file) as f:
                 data = json.load(f)
             matrix = []
             for arr in data["grid"]:

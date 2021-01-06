@@ -1,4 +1,8 @@
+from lib.cell import CellType
 from lib.direction import Direction
+
+class EndOfGridException(Exception):
+    pass
 
 # Modélise un curseur associé à une grille.
 class Cursor:
@@ -92,3 +96,18 @@ class Cursor:
     # Déplace le curseur sur la première cellule de la ligne du dessous.
     def nextLine(self):
         self.__coord = (0, self.getCoordY() + 1)
+
+    def goToNextCell(self):
+        if self.canMove(Direction.RIGHT):
+            self.move(Direction.RIGHT)
+        else:
+            if self.canMove(Direction.DOWN):
+                self.nextLine()
+            else:
+                raise EndOfGridException
+
+    def goToNextIsland(self):
+         while True:
+            self.goToNextCell()
+            if self.getCell().getType() == CellType.ISLAND:
+                break
