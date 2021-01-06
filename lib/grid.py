@@ -216,19 +216,19 @@ class Grid:
         c = copy.copy(cursor if cursor != None else self.getCursor())
         cp = copy.copy(c)
 
-        while True:
-            if c.canMove(direction):
-                c.move(direction)
-            if self.getCell(c).getType() == CellType.ISLAND:
-                if c == self.getCursor():
-                    return None
-                return c
-            if self.getCell(c).getType() == CellType.BRIDGE:
-                if self.getCell(cp).getIsland().getBridges(direction) > 0:
-                    continue
-                return None
-            else:
-                return c
+        # while True:
+        #     if c.canMove(direction):
+        #         c.move(direction)
+        #     if self.getCell(c).getType() == CellType.ISLAND:
+        #         if c == self.getCursor():
+        #             return None
+        #         return c
+        #     if self.getCell(c).getType() == CellType.BRIDGE:
+        #         if self.getCell(cp).getIsland().getBridges(direction) > 0:
+        #             continue
+        #         return None
+        #     else:
+        #         return c
 
         if c.canMove(direction):
             c.move(direction)

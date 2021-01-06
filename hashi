@@ -11,15 +11,17 @@ def main():
         exit(1)
 
     for arg in sys.argv[1:]:
-        grid = GridLoader(arg).load()
-        print("Trying to solve : " + arg + "\n")
+        grid = GridLoader.load(arg)
+
+        print("Trying to solve: " + arg + "...\n")
         grid.display()
-        solution = grid.solve()
         print("")
+
+        solution = grid.solve()
         if solution == None:
             print("No solution found.")
         else:
-            print("A result, here is :\n")
+            print("A great result, here is:\n")
             solution.display()
             print("")
 
