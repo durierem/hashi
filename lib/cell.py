@@ -58,6 +58,14 @@ class Cell:
     def getIsland(self):
         return self.__island
 
+    # Renvoie vrai si l'île associée est une île.
+    def isIsland(self):
+        return self.__type == CellType.ISLAND
+
+    # Renvoie vrai si l'île associée est un pont.
+    def isBridge(self):
+        return self.__type == CellType.BRIDGE
+
     # COMMANDES
 
     def display(self):

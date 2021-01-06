@@ -207,6 +207,8 @@ class Grid:
             newGrids.append(g)
         return newGrids
 
+
+
     # S'il existe une île pouvant être reliée à la cellule pointée par
     # 'cursor' dans la 'direction' donnée, renvoie un curseur pointant sur les
     # coordonnées de cette île. Sinon renvoie None.
@@ -214,39 +216,19 @@ class Grid:
     # Dans tout les cas, le curseur donné n'est pas modifié.
     def __findNeighbor(self, direction, cursor=None):
         c = copy.copy(cursor if cursor != None else self.getCursor())
-        cp = copy.copy(c)
+        condition = self.getCell(c).getIsland().getBridges(direction) > 0
 
-        # while True:
-        #     if c.canMove(direction):
-        #         c.move(direction)
-        #     if self.getCell(c).getType() == CellType.ISLAND:
-        #         if c == self.getCursor():
-        #             return None
-        #         return c
-        #     if self.getCell(c).getType() == CellType.BRIDGE:
-        #         if self.getCell(cp).getIsland().getBridges(direction) > 0:
-        #             continue
-        #         return None
-        #     else:
-        #         return c
-
-        if c.canMove(direction):
+        while c.canMove(direction):
             c.move(direction)
-        while (
-            self.getCell(c).getType() != CellType.ISLAND
-            and (
-                self.getCell(c).getType() != CellType.BRIDGE
-                or self.getCell(cp).getIsland().getBridges(direction) > 0
-            )
-            and c.canMove(direction)
-        ):
-            c.move(direction)
-        if (
-            self.getCursor() == c
-            or self.getCell(c).getType() != CellType.ISLAND
-        ):
+            cl = self.getCell(c)
+            if cl.isIsland() or (cl.isBridge() and not condition):
+                break
+      
+        if self.getCursor() == c or not self.getCell(c).isIsland():
             return None
         return c
+
+
 
     def __hasNextIsland(self, cursor=None):
         c = copy.copy(cursor if cursor != None else self.getCursor())
