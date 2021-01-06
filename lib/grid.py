@@ -99,30 +99,7 @@ class Grid:
             if c.getCoordX() == self.getWidth() - 1:
                 print("")
 
-    # Renvoie la grille résolue ou None s'il n'existe pas de solution.
-    def solve(self):
-        # Si aucune île dans le graphe, le graphe est solution de lui-même
-        if self.getCell().getType() != CellType.ISLAND:
-            if self.__hasNextIsland():
-                self.__goToNextIsland()
-            else:
-                return self
 
-        # ALGOOOO
-        grids = [self]
-        while grids:
-            g = grids.pop(0)
-            buf = g.__createGrids()
-            for i in buf:
-                if not i.__hasNextIsland():
-                    if i.__isConnected():
-                        return i
-                    else:
-                        break
-                i.__goToNextIsland()
-                grids.append(i)
-
-        return None
 
     # OUTILS
 
@@ -150,6 +127,7 @@ class Grid:
     # le curseur de la grille actuelle.
     def __createGrids(self):
         combinations = self.allBridgeCombinations.copy()
+        combinations.pop(0)
 
         # Les curseurs vers les îles voisines de l'île courante.
         neighborCursors = {
@@ -183,7 +161,6 @@ class Grid:
             == self.getIsland().getMaxBridges()
             - self.getIsland().getTotalBridges()
         ]
-
         # ...
         newGrids = []
         for i in combinations:
@@ -218,6 +195,7 @@ class Grid:
     # Dans tout les cas, le curseur donné n'est pas modifié.
     def __findNeighbor(self, direction, cursor=None):
         c = Cursor(self,cursor.getCoord()) if cursor != None else Cursor(self,self.getCursor().getCoord())
+        cb = Cursor(self,cursor.getCoord()) if cursor != None else Cursor(self,self.getCursor().getCoord())
         if c.canMove(direction):
             c.move(direction)
 
@@ -225,7 +203,7 @@ class Grid:
             self.getCell(c).getType() != CellType.ISLAND
             and (
                 self.getCell(c).getType() != CellType.BRIDGE
-                or self.getIsland().getBridges(direction) > 0
+                or cb.getCell().getIsland().getBridges(direction) > 0
             )
             and c.canMove(direction)
         ):
@@ -307,12 +285,14 @@ class Grid:
                     buf = Cursor(self, c.getCoord())
                     vertex.append(buf)
                     for d in Direction:
-                        if c.getCell().getIsland().getBridges(d) != 0:
+                        if c.getCell().getIsland().getBridges(d) > 0:
                             c2 = self.__findNeighbor(d, c)
                             if c2 != None:
                                 buf = Cursor(self,c.getCoord())
+
                                 if edge.count((buf,c2)) == 0 and edge.count((c2,buf)) == 0:
                                     edge.append((buf,c2))
+
             father = []
             for i in vertex:
                 #foretDiscrete()
@@ -349,7 +329,103 @@ class Grid:
                     else:
                         father[r1] = father[r1] + father[r2]
                         father[r2] = r1
-                    print(father)
 
-            print(len(edge))
             return father.count(-len(father)) == 1
+
+    def solve2(self):
+        if self.getCell().getType() != CellType.ISLAND:
+            if self.__hasNextIsland():
+                self.__goToNextIsland()
+            else:
+                return self
+
+        # ALGOOOO
+        grids = [self]
+        hasChange = True
+        while hasChange:
+            d = 0
+            hasChange = False
+            grids[0].getCursor().setCoord((0,0))
+            while grids[0].__hasNextIsland():
+                grids[0].__goToNextIsland()
+                buf = grids[0].__createGrids()
+                if len(buf) == 1 and buf != []:
+                    grids[0] = buf[0]
+                    grids[0].display()
+                    hasChange = True
+        return grids[0]
+
+    # Renvoie la grille résolue ou None s'il n'existe pas de solution.
+    def solve(self):
+        # Si aucune île dans le graphe, le graphe est solution de lui-même
+        if self.getCell().getType() != CellType.ISLAND:
+            if self.__hasNextIsland():
+                self.__goToNextIsland()
+            else:
+                return self
+
+        # ALGOOOO
+        grids = [self]
+        while grids:
+            g = grids.pop(0)
+            #g.display()
+            #bufc = Cursor(g,g.getCursor().getCoord())
+            #print("soleve2:")
+            #g = g.solve2()
+            #g.getCursor().setCoord(bufc.getCoord())
+            buf = g.__createGrids()
+            for i in buf:
+                if not i.__hasNextIsland():
+                    if i.__isConnected():
+                        return i
+                    else:
+                        i.display()
+                        break
+                i.__goToNextIsland()
+                grids.append(i)
+
+        return None
+
+    def solveL(self):
+        if self.getCell().getType() != CellType.ISLAND:
+            if self.__hasNextIsland():
+                self.__goToNextIsland()
+            else:
+                return self
+        #pas bon le dernier cursor
+        grids = [(self,[Cursor(self,self.getCursor().getCoord())],Cursor(self,(3,3)))]
+        j = 0
+        while grids:
+            e = grids.pop(0)
+            g,lc,lastPositionC = e
+            print("-------boucle----------")
+            print("lc:")
+            print(len(lc))
+            print("g:")
+            g.display()
+            for c in lc:
+                g.getCursor().setCoord(c.getCoord())
+                buf = g.__createGrids()
+                print("buf:")
+                print(len(buf))
+                for i in buf:
+                    lNeighbor = []
+                    print("i")
+                    i.display()
+                    for d in Direction:
+                        bufc =  i.__findNeighbor(d)
+                        if bufc != None:
+                            print("cc")
+                            if bufc.getCoord() != lastPositionC.getCoord():
+                                if i.getIsland().getBridges(d) > 0:
+                                    cn = bufc
+                                    lNeighbor.append(cn)
+                    print("lN:")
+                    [print(i) for i in lNeighbor]
+                    print()
+                    grids.append((i,lNeighbor[:],Cursor(i,i.getCursor().getCoord())))
+            print("grids:")
+            [i.display() for (i,x,y) in grids]
+            print(len(grids))
+            j += 1
+        return None
