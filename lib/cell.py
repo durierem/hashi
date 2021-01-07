@@ -122,7 +122,7 @@ class Cell:
     # Fixe la direction des ponts contenus dans la cellule.
     #
     # direction - La direction donnée.
-    def setDirection(self, direction):
+    def setBridgeDirection(self, direction):
         assert (
             self.getType() == CellType.BRIDGE
         ), "cell type is not 'CellType.BRIDGE'"

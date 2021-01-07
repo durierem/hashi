@@ -1,8 +1,10 @@
 from lib.cell import CellType
 from lib.direction import Direction
 
+
 class EndOfGridException(Exception):
     pass
+
 
 # Modélise un curseur associé à une grille.
 class Cursor:
@@ -65,9 +67,11 @@ class Cursor:
     #
     # direction - La Direction a tester.
     def canMove(self, direction):
-        x, y = Direction.add(direction, self.__coord) 
-        if x < 0 or x >= self.getGrid().getWidth(): return False
-        if y < 0 or y >= self.getGrid().getHeight(): return False 
+        x, y = Direction.add(direction, self.__coord)
+        if x < 0 or x >= self.getGrid().getWidth():
+            return False
+        if y < 0 or y >= self.getGrid().getHeight():
+            return False
         return True
 
     # COMMANDES
@@ -102,7 +106,7 @@ class Cursor:
                 raise EndOfGridException
 
     def goToNextIsland(self):
-         while True:
+        while True:
             self.goToNextCell()
             if self.getCell().getType() == CellType.ISLAND:
                 break

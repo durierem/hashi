@@ -53,6 +53,10 @@ class Island:
     def getMaxBridges(self):
         return self.__maxBridges
 
+    # Renvoie le nombre de ponts nécéssaires pour que l'île soit complétée.
+    def getNeededBridges(self):
+        return self.getMaxBridges() - self.getTotalBridges()
+
     # Renvoie le nombre de ponts reliables à l'île dans une direction.
     #
     # direction - La Direction donnée.

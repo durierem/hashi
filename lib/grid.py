@@ -105,10 +105,10 @@ class Grid:
         if not self.getCell().isIsland():
             if not self.__hasNextIsland():
                 return False
-        
+
         # L'algorithme nécessite de placer le curseur sur la première île.
         self.__goToNextIsland()
-        
+
         queue = [self]
         while queue:
             grids = queue.pop(0).__createGrids()
@@ -135,7 +135,7 @@ class Grid:
         keys = [d for d in Direction]
         for a, b, c, d in itertools.product([0, 1, 2], repeat=4):
             values = [a, b, c, d]
-            res.append({k:v for (k, v) in zip(keys, values)})
+            res.append({k: v for (k, v) in zip(keys, values)})
         return res
 
     # Renvoie une liste composée de nouvelles grilles construites à partir de
@@ -146,57 +146,53 @@ class Grid:
         combinations.pop(0)
 
         # Les curseurs vers les îles voisines de l'île courante.
-        neighborCursors = {
-            Direction.LEFT: None,
-            Direction.UP: None,
-            Direction.RIGHT: None,
-            Direction.DOWN: None,
-        }
+        cursors = {k: v for k in Direction for v in [None]}
 
-        # ...
+        # Filtre les combinaisons de ponts possibles pour ne garder que celles
+        # compatibles avec le nombre d'île requis par l'île pointée par le
+        # curseur courant.
+        n = self.getIsland().getNeededBridges()
+        combinations = [i for i in combinations if sum(i.values()) == n]
+
+        # Filtre une deuxième fois les combinaisons pour ne garder que celles
+        # possibles au vu de la position de l'île dans la grille.
         for d in Direction:
-            neighborCursors[d] = self.__findNeighbor(d)
+            cursors[d] = self.__findNeighbor(d)
             op = Direction.opposite(d)
-            if neighborCursors[d] != None:
-                combinations = [
-                    i for i in combinations
-                    if i[d] <= self.getIsland(neighborCursors[d]).getPossibleBridges(op)
-                ]
+            if cursors[d] != None:
+                threshold = self.getIsland(cursors[d]).getPossibleBridges(op)
+                combinations = [i for i in combinations if i[d] <= threshold]
             else:
-                combinations = [i for i in combinations if i[d] <= 0]
+                combinations = [i for i in combinations if i[d] == 0]
 
-        # ...
-        combinations = [
-            i
-            for i in combinations
-            if sum(i.values()) == self.getIsland().getMaxBridges() - self.getIsland().getTotalBridges()
-        ]
-        # ...
+        # Construit la liste de nouvelles grilles.
         newGrids = []
         for i in combinations:
             g = copy.deepcopy(self)
             for d in Direction:
-                op = Direction.opposite(d)
                 if i[d] != 0:
-                    for k in range(i[d]):
-                        g.getIsland().addBridge(d)
-                        g.getIsland(neighborCursors[d]).addBridge(op)
-                    c = Cursor(g, self.getCursor().getCoord())
-                    isDual = (
-                        True
-                        if c.getCell().getIsland().getBridges(d)
-                        == Island.MAX_BRIDGES_BY_DIRECTION
-                        else False
-                    )
-                    c.move(d)
-                    while not g.getCell(c).isIsland():
-                        g.getCell(c).setType(CellType.BRIDGE)
-                        g.getCell(c).setDirection(d)
-                        if isDual:
-                            g.getCell(c).setDual()
-                        c.move(d)
+                    g.__linkIslands(g.getCursor(), d, cursors[d], i[d])
             newGrids.append(g)
+
         return newGrids
+
+    # Relie les îles pointées par les curseurs 'c1' et 'c2' avec 'n' pont(s) de
+    # 'direction' donnée: Le(s) pont(s) est(sont) ajouté(s) aux deux îles et
+    # les cellules entre les deux îles sont définies comme des ponts.
+    def __linkIslands(self, c1, direction, c2, n):
+        for k in range(n):
+            self.getIsland(c1).addBridge(direction)
+            self.getIsland(c2).addBridge(Direction.opposite(direction))
+
+        c = copy.copy(self.getCursor())
+        while True:
+            c.move(direction)
+            if self.getCell(c).isIsland():
+                break
+            self.getCell(c).setType(CellType.BRIDGE)
+            self.getCell(c).setBridgeDirection(direction)
+            if n == 2:
+                self.getCell(c).setDual()
 
     # S'il existe une île pouvant être reliée à la cellule pointée par
     # 'cursor' dans la 'direction' donnée, renvoie un curseur pointant sur les
@@ -212,7 +208,7 @@ class Grid:
             cl = self.getCell(c)
             if cl.isIsland() or (cl.isBridge() and not condition):
                 break
-      
+
         if self.getCursor() == c or not self.getCell(c).isIsland():
             return None
         return c
@@ -240,59 +236,62 @@ class Grid:
 
     # Renvoie vrai si le graphe formé par les îles est connexe.
     def __isConnected(self):
-            vertex = []
-            edge = []
-            for c in self:
-                if c.getCell().isIsland():
-                    buf = Cursor(self, c.getCoord())
-                    vertex.append(buf)
-                    for d in Direction:
-                        if c.getCell().getIsland().getBridges(d) > 0:
-                            c2 = self.__findNeighbor(d, c)
-                            if c2 != None:
-                                buf = Cursor(self,c.getCoord())
+        vertex = []
+        edge = []
+        for c in self:
+            if c.getCell().isIsland():
+                buf = Cursor(self, c.getCoord())
+                vertex.append(buf)
+                for d in Direction:
+                    if c.getCell().getIsland().getBridges(d) > 0:
+                        c2 = self.__findNeighbor(d, c)
+                        if c2 != None:
+                            buf = Cursor(self, c.getCoord())
 
-                                if edge.count((buf,c2)) == 0 and edge.count((c2,buf)) == 0:
-                                    edge.append((buf,c2))
+                            if (
+                                edge.count((buf, c2)) == 0
+                                and edge.count((c2, buf)) == 0
+                            ):
+                                edge.append((buf, c2))
 
-            father = []
-            for i in vertex:
-                #foretDiscrete()
-                father.append(-1)
-            for e in edge:
-                x,y = e
-                x = vertex.index(x)
-                y = vertex.index(y)
-                #Trouverrapide(x, r1, pere)
-                i = x
-                while father[i] > -1:
-                    i = father[i]
-                r1 = i
-                i = x
-                while father[i] > -1:
-                    j = i
-                    i = father[i]
-                    father[j] = r1
-                #Trouverrapide(x, r2, pere)
-                i = y
-                while father[i] > -1:
-                    i = father[i]
-                r2 = i
-                i = y
-                while father[i] > -1:
-                    j = i
-                    i = father[i]
-                    father[j] = r2
-                #Reunirpondere(r1,r2,pere)
-                if r1 != r2 :
-                    if father[r1] > father[r2]:
-                        father[r2] = father[r1] + father[r2]
-                        father[r1] = r2
-                    else:
-                        father[r1] = father[r1] + father[r2]
-                        father[r2] = r1
+        father = []
+        for i in vertex:
+            # foretDiscrete()
+            father.append(-1)
+        for e in edge:
+            x, y = e
+            x = vertex.index(x)
+            y = vertex.index(y)
+            # Trouverrapide(x, r1, pere)
+            i = x
+            while father[i] > -1:
+                i = father[i]
+            r1 = i
+            i = x
+            while father[i] > -1:
+                j = i
+                i = father[i]
+                father[j] = r1
+            # Trouverrapide(x, r2, pere)
+            i = y
+            while father[i] > -1:
+                i = father[i]
+            r2 = i
+            i = y
+            while father[i] > -1:
+                j = i
+                i = father[i]
+                father[j] = r2
+            # Reunirpondere(r1,r2,pere)
+            if r1 != r2:
+                if father[r1] > father[r2]:
+                    father[r2] = father[r1] + father[r2]
+                    father[r1] = r2
+                else:
+                    father[r1] = father[r1] + father[r2]
+                    father[r2] = r1
 
-            return father.count(-len(father)) == 1
+        return father.count(-len(father)) == 1
 
     def solve2(self):
         if not self.getCell().isIsland():
@@ -307,7 +306,7 @@ class Grid:
         while hasChange:
             d = 0
             hasChange = False
-            grids[0].getCursor().setCoord((0,0))
+            grids[0].getCursor().setCoord((0, 0))
             while grids[0].__hasNextIsland():
                 grids[0].__goToNextIsland()
                 buf = grids[0].__createGrids()
@@ -323,12 +322,18 @@ class Grid:
                 self.__goToNextIsland()
             else:
                 return self
-        #pas bon le dernier cursor
-        grids = [(self,[Cursor(self,self.getCursor().getCoord())],Cursor(self,(3,3)))]
+        # pas bon le dernier cursor
+        grids = [
+            (
+                self,
+                [Cursor(self, self.getCursor().getCoord())],
+                Cursor(self, (3, 3)),
+            )
+        ]
         j = 0
         while grids:
             e = grids.pop(0)
-            g,lc,lastPositionC = e
+            g, lc, lastPositionC = e
             print("-------boucle----------")
             print("lc:")
             print(len(lc))
@@ -344,7 +349,7 @@ class Grid:
                     print("i")
                     i.display()
                     for d in Direction:
-                        bufc =  i.__findNeighbor(d)
+                        bufc = i.__findNeighbor(d)
                         if bufc != None:
                             print("cc")
                             if bufc.getCoord() != lastPositionC.getCoord():
@@ -354,9 +359,11 @@ class Grid:
                     print("lN:")
                     [print(i) for i in lNeighbor]
                     print()
-                    grids.append((i,lNeighbor[:],Cursor(i,i.getCursor().getCoord())))
+                    grids.append(
+                        (i, lNeighbor[:], Cursor(i, i.getCursor().getCoord()))
+                    )
             print("grids:")
-            [i.display() for (i,x,y) in grids]
+            [i.display() for (i, x, y) in grids]
             print(len(grids))
             j += 1
         return None
