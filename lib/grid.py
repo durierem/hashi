@@ -91,7 +91,7 @@ class Grid:
             if c.getCoordX() == self.getWidth() - 1:
                 print("")
 
-    
+    # Affiche la matrice associé à la grille.
     def display_matrix(self):
         for c in self:
             c.getCell().display_value()
@@ -199,7 +199,7 @@ class Grid:
                         else False
                     )
                     c.move(d)
-                    while g.getCell(c).getType() != CellType.ISLAND:
+                    while not g.getCell(c).isIsland():
                         g.getCell(c).setType(CellType.BRIDGE)
                         g.getCell(c).setDirection(d)
                         if isDual:
@@ -227,6 +227,7 @@ class Grid:
             return None
         return c
 
+    # Renvoie vrai une autre est présente dans le sens de lecture.
     def __hasNextIsland(self, cursor=None):
         c = copy.copy(cursor if cursor != None else self.getCursor())
         while True:
@@ -239,16 +240,20 @@ class Grid:
                     continue
                 return True
 
+    # Déplace le curseur sur la prochaîne île dans le sens de lecture.
     def __goToNextIsland(self):
+        assert self.__hasNextIsland(), "No island left"
+
         self.getCursor().goToNextIsland()
         if self.getIsland().isFull():
             return self.__goToNextIsland()
 
+    # Renvoie vrai si le graphe formé par les îles est connexe.
     def __isConnected(self):
             vertex = []
             edge = []
             for c in self:
-                if c.getCell().getType() == CellType.ISLAND:
+                if c.getCell().isIsland():
                     buf = Cursor(self, c.getCoord())
                     vertex.append(buf)
                     for d in Direction:
@@ -300,7 +305,7 @@ class Grid:
             return father.count(-len(father)) == 1
 
     def solve2(self):
-        if self.getCell().getType() != CellType.ISLAND:
+        if not self.getCell().isIsland():
             if self.__hasNextIsland():
                 self.__goToNextIsland()
             else:
@@ -323,7 +328,7 @@ class Grid:
         return grids[0]
 
     def solveL(self):
-        if self.getCell().getType() != CellType.ISLAND:
+        if not self.getCell().getType() != CellType.ISLAND:
             if self.__hasNextIsland():
                 self.__goToNextIsland()
             else:

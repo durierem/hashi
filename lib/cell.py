@@ -68,7 +68,7 @@ class Cell:
 
     # COMMANDES
 
-    #
+    # Affiche la cellule.
     def display(self):
         if self.__type == CellType.ISLAND:
             print(" " + str(self.__island.getMaxBridges()) + " ", end="")
@@ -112,12 +112,16 @@ class Cell:
         ), "cell type is not 'CellType.ISLAND'"
         self.__island = island
 
+    # Fixe la dualité des ponts contenus dans la cellule à vrai.
     def setDual(self):
         assert (
             self.getType() == CellType.BRIDGE
         ), "cell type is not 'CellType.BRIDGE'"
         self.__dual = True
 
+    # Fixe la direction des ponts contenus dans la cellule.
+    #
+    # direction - La direction donnée.
     def setDirection(self, direction):
         assert (
             self.getType() == CellType.BRIDGE
