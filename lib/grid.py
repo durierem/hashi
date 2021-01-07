@@ -1,4 +1,5 @@
 import copy
+import itertools
 
 from lib.cell import *
 from lib.cursor import Cursor
@@ -130,23 +131,12 @@ class Grid:
     # nombre de ponts présents dans cette direction.
     @staticmethod
     def __createAllBridgeCombinations():
-        l = []
-        for i0 in range(3):
-            buf = {
-                Direction.LEFT: 0,
-                Direction.UP: 0,
-                Direction.RIGHT: 0,
-                Direction.DOWN: 0,
-            }
-            buf[Direction.LEFT] = i0
-            for i1 in range(3):
-                buf[Direction.UP] = i1
-                for i2 in range(3):
-                    buf[Direction.RIGHT] = i2
-                    for i3 in range(3):
-                        buf[Direction.DOWN] = i3
-                        l.append(buf.copy())
-        return l
+        res = []
+        keys = [d for d in Direction]
+        for a, b, c, d in itertools.product([0, 1, 2], repeat=4):
+            values = [a, b, c, d]
+            res.append({k:v for (k, v) in zip(keys, values)})
+        return res
 
     # Renvoie une liste composée de nouvelles grilles construites à partir de
     # la grille actuelle en ajoutant les ponts posibles à l'île pointée par
