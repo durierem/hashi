@@ -1,5 +1,6 @@
 import copy
 import itertools
+from threading import Thread
 
 from lib.cell import *
 from lib.cursor import Cursor
@@ -110,18 +111,38 @@ class Grid:
         self.__goToNextIsland()
 
         queue = [self]
+        results = []
+        threads = []
+
+        # Création des threads
+        for i in range(4):
+            t = Thread(target=self.__threadedSolve, args=(queue, results))
+            threads.append(t)
+            t.start()
+
+        # Attente de leur terminaison
+        for t in threads:
+            t.join()
+
+        # Si un des résulats est une grille, la renvoie, sinon renvoie None
+        for r in results:
+            if r != None:
+                return r
+        return None
+
+    def __threadedSolve(self, queue, results):
         while queue:
             grids = queue.pop(0).__createGrids()
             for g in grids:
                 if not g.__hasNextIsland():
                     if g.__isConnected():
-                        return g
+                        results.append(g)
                     else:
                         break
-                g.__goToNextIsland()
+                else:
+                    g.__goToNextIsland()
                 queue.append(g)
-
-        return None
+        results.append(None)
 
     # OUTILS
 
