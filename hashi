@@ -14,7 +14,7 @@ def main():
         grid = GridLoader.load(arg)
 
         print("Trying to solve: " + arg + "...\n")
-        grid.display_matrix()
+        grid.displayMatrix()
         print("")
 
         solution = grid.solve()

@@ -52,6 +52,14 @@ class Grid:
 
     # REQUÊTES
 
+    # Renvoie le curseur principal associé à la grille.
+    def getCursor(self):
+        return self.__cursor
+
+    # Renvoie la hauteur de la grille.
+    def getHeight(self):
+        return len(self.__matrix)
+
     # Renvoie la matrice associée à la grille.
     def getMatrix(self):
         self.__matrix
@@ -59,14 +67,6 @@ class Grid:
     # Renvoie la largeur de la grille.
     def getWidth(self):
         return len(self.__matrix[0])
-
-    # Renvoie la hauteur de la grille.
-    def getHeight(self):
-        return len(self.__matrix)
-
-    # Renvoie le curseur principal associé à la grille.
-    def getCursor(self):
-        return self.__cursor
 
     # Renvoie la cellule pointée par un curseur.
     #
@@ -85,6 +85,8 @@ class Grid:
         c = cursor if cursor != None else self.getCursor()
         return self.getCell(c).getIsland()
 
+    # COMMANDES
+
     # Affiche la grille.
     def display(self):
         for c in self:
@@ -93,7 +95,7 @@ class Grid:
                 print("")
 
     # Affiche la matrice associé à la grille.
-    def display_matrix(self):
+    def displayMatrix(self):
         for c in self:
             c.getCell().display_value()
             if c.getCoordX() == self.getWidth() - 1:
@@ -101,13 +103,22 @@ class Grid:
 
     # Renvoie la grille résolue ou None s'il n'existe pas de solution.
     def solve(self):
+        # Pré-résout la grille avec les ponts obligatoires.
+        self = self.__presolve()
+
+        # Réinitialise le curseur de la grille.
+        self.getCursor().setCoord((0, 0))
+
         # Si aucune île dans le graphe, le graphe est solution de lui-même.
         if not self.getCell().isIsland():
             if not self.__hasNextIsland():
-                return False
-
-        # L'algorithme nécessite de placer le curseur sur la première île.
-        self.__goToNextIsland()
+                if self.__isConnected():
+                    return self
+                else:
+                    return False
+            else:
+                # Il placer le curseur sur la première île.
+                self.__goToNextIsland()
 
         queue = [self]
         while queue:
@@ -127,7 +138,7 @@ class Grid:
 
     # Renvoie une liste de toutes les combinaison de nombres de ponts dans les
     # 4 directions possibles pour une cellule.
-    # Les combinaisons sont des dictionnaires associants à chaque direction, le
+    # Les combinaisons sont des dictionnaires associant à chaque direction, le
     # nombre de ponts présents dans cette direction.
     @staticmethod
     def __createAllBridgeCombinations():
@@ -139,7 +150,7 @@ class Grid:
         return res
 
     # Renvoie une liste composée de nouvelles grilles construites à partir de
-    # la grille actuelle en ajoutant les ponts posibles à l'île pointée par
+    # la grille actuelle en ajoutant les ponts possibles à l'île pointée par
     # le curseur de la grille actuelle.
     def __createGrids(self):
         combinations = self.allBridgeCombinations.copy()
@@ -176,24 +187,6 @@ class Grid:
 
         return newGrids
 
-    # Relie les îles pointées par les curseurs 'c1' et 'c2' avec 'n' pont(s) de
-    # 'direction' donnée: Le(s) pont(s) est(sont) ajouté(s) aux deux îles et
-    # les cellules entre les deux îles sont définies comme des ponts.
-    def __linkIslands(self, c1, direction, c2, n):
-        for k in range(n):
-            self.getIsland(c1).addBridge(direction)
-            self.getIsland(c2).addBridge(Direction.opposite(direction))
-
-        c = copy.copy(self.getCursor())
-        while True:
-            c.move(direction)
-            if self.getCell(c).isIsland():
-                break
-            self.getCell(c).setType(CellType.BRIDGE)
-            self.getCell(c).setBridgeDirection(direction)
-            if n == 2:
-                self.getCell(c).setDual()
-
     # S'il existe une île pouvant être reliée à la cellule pointée par
     # 'cursor' dans la 'direction' donnée, renvoie un curseur pointant sur les
     # coordonnées de cette île. Sinon renvoie None.
@@ -213,6 +206,14 @@ class Grid:
             return None
         return c
 
+     # Déplace le curseur sur la prochaine île dans le sens de lecture.
+    def __goToNextIsland(self):
+        assert self.__hasNextIsland(), "No island left"
+
+        self.getCursor().goToNextIsland()
+        if self.getIsland().isFull():
+            return self.__goToNextIsland()
+
     # Renvoie vrai une autre est présente dans le sens de lecture.
     def __hasNextIsland(self, cursor=None):
         c = copy.copy(cursor if cursor != None else self.getCursor())
@@ -225,14 +226,6 @@ class Grid:
                 if c.getCell().getIsland().isFull():
                     continue
                 return True
-
-    # Déplace le curseur sur la prochaîne île dans le sens de lecture.
-    def __goToNextIsland(self):
-        assert self.__hasNextIsland(), "No island left"
-
-        self.getCursor().goToNextIsland()
-        if self.getIsland().isFull():
-            return self.__goToNextIsland()
 
     # Renvoie vrai si le graphe formé par les îles est connexe.
     def __isConnected(self):
@@ -293,14 +286,31 @@ class Grid:
 
         return father.count(-len(father)) == 1
 
-    def solve2(self):
-        if not self.getCell().isIsland():
-            if self.__hasNextIsland():
-                self.__goToNextIsland()
-            else:
-                return self
+    # Relie les îles pointées par les curseurs 'c1' et 'c2' avec 'n' pont(s) de
+    # 'direction' donnée: Le(s) pont(s) est(sont) ajouté(s) aux deux îles et
+    # les cellules entre les deux îles sont définies comme des ponts.
+    def __linkIslands(self, c1, direction, c2, n):
+        for k in range(n):
+            self.getIsland(c1).addBridge(direction)
+            self.getIsland(c2).addBridge(Direction.opposite(direction))
 
-        # ALGOOOO
+        c = copy.copy(self.getCursor())
+        while True:
+            c.move(direction)
+            if self.getCell(c).isIsland():
+                break
+            self.getCell(c).setType(CellType.BRIDGE)
+            self.getCell(c).setBridgeDirection(direction)
+            if n == 2:
+                self.getCell(c).setDual()
+
+    def __presolve(self):
+        # if not self.getCell().isIsland():
+        #     if self.__hasNextIsland():
+        #         self.__goToNextIsland()
+        #     else:
+        #         return self
+
         grids = [self]
         hasChange = True
         while hasChange:
@@ -308,62 +318,11 @@ class Grid:
             hasChange = False
             grids[0].getCursor().setCoord((0, 0))
             while grids[0].__hasNextIsland():
+                #grids[0].display()
                 grids[0].__goToNextIsland()
                 buf = grids[0].__createGrids()
+                sumOfN = 0
                 if len(buf) == 1 and buf != []:
                     grids[0] = buf[0]
-                    grids[0].display()
                     hasChange = True
         return grids[0]
-
-    def solveL(self):
-        if not self.getCell().getType() != CellType.ISLAND:
-            if self.__hasNextIsland():
-                self.__goToNextIsland()
-            else:
-                return self
-        # pas bon le dernier cursor
-        grids = [
-            (
-                self,
-                [Cursor(self, self.getCursor().getCoord())],
-                Cursor(self, (3, 3)),
-            )
-        ]
-        j = 0
-        while grids:
-            e = grids.pop(0)
-            g, lc, lastPositionC = e
-            print("-------boucle----------")
-            print("lc:")
-            print(len(lc))
-            print("g:")
-            g.display()
-            for c in lc:
-                g.getCursor().setCoord(c.getCoord())
-                buf = g.__createGrids()
-                print("buf:")
-                print(len(buf))
-                for i in buf:
-                    lNeighbor = []
-                    print("i")
-                    i.display()
-                    for d in Direction:
-                        bufc = i.__findNeighbor(d)
-                        if bufc != None:
-                            print("cc")
-                            if bufc.getCoord() != lastPositionC.getCoord():
-                                if i.getIsland().getBridges(d) > 0:
-                                    cn = bufc
-                                    lNeighbor.append(cn)
-                    print("lN:")
-                    [print(i) for i in lNeighbor]
-                    print()
-                    grids.append(
-                        (i, lNeighbor[:], Cursor(i, i.getCursor().getCoord()))
-                    )
-            print("grids:")
-            [i.display() for (i, x, y) in grids]
-            print(len(grids))
-            j += 1
-        return None

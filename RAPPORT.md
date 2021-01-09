@@ -130,7 +130,7 @@ Fonction TrouverSolution(g):
     Renvoyer Vide
 ```
 
-# Difficultés rencontrées
+# Difficultés rencontrées et pistes d'améliorations
 
 Le choix de la structure de données qui représente une grille a été un réel
 défi lors de la réalisation du projet. La difficulté majeure fût de trouver
@@ -149,8 +149,3 @@ Dans la même quête d'amélioration de la vitesse d'exécution, nous avons essa
 de paralléliser le processus avec des threads.
 
 ...
-
-# Pistes d'améliorations
-
-- parallélisation
-- presolve
