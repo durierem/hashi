@@ -109,15 +109,17 @@ class Grid:
         # Réinitialise le curseur de la grille.
         self.getCursor().setCoord((0, 0))
 
+        # Si le graphe est complétée connexe, c'est une solution.
+        if not self.__hasNextIsland():
+            if self.__isConnected():
+                return self
+
         # Si aucune île dans le graphe, le graphe est solution de lui-même.
         if not self.getCell().isIsland():
             if not self.__hasNextIsland():
-                if self.__isConnected():
-                    return self
-                else:
-                    return False
+                return False
             else:
-                # Il placer le curseur sur la première île.
+                # Il faut placer le curseur sur la première île.
                 self.__goToNextIsland()
 
         queue = [self]
@@ -305,24 +307,14 @@ class Grid:
                 self.getCell(c).setDual()
 
     def __presolve(self):
-        # if not self.getCell().isIsland():
-        #     if self.__hasNextIsland():
-        #         self.__goToNextIsland()
-        #     else:
-        #         return self
-
-        grids = [self]
         hasChange = True
         while hasChange:
-            d = 0
             hasChange = False
-            grids[0].getCursor().setCoord((0, 0))
-            while grids[0].__hasNextIsland():
-                #grids[0].display()
-                grids[0].__goToNextIsland()
-                buf = grids[0].__createGrids()
-                sumOfN = 0
-                if len(buf) == 1 and buf != []:
-                    grids[0] = buf[0]
+            self.getCursor().setCoord((0, 0))
+            while self.__hasNextIsland():
+                self.__goToNextIsland()
+                buf = self.__createGrids()
+                if len(buf) == 1:
+                    self = buf[0]
                     hasChange = True
-        return grids[0]
+        return self
