@@ -55,11 +55,13 @@ en bas.
 
 Dans un premier temps, nous avons besoin d’expliquer une notion importante de
 notre algorithme : les « ponts possibles ». À partir d’une île, les ponts
-possibles représentent toutes les manières possibles de compléter cette île. C'est-à-dire de lui ajouter autant de ponts qu'elle en a besoin.
+possibles représentent toutes les manières possibles de compléter cette île.
+C'est-à-dire de lui ajouter autant de ponts qu'elle en a besoin.
 
 ### 2.1.1 Exemple 1
 
-Voici un exemple où le curseur de la grille se trouve sur l’île 3, on veux la compléter de toutes les façons possible. À gauche, la configuration initiale,
+Voici un exemple où le curseur de la grille se trouve sur l’île 3, on veux la
+compléter de toutes les façons possible. À gauche, la configuration initiale,
 à droite, les deux configurations possibles.
 
 ```
@@ -89,7 +91,8 @@ la configuration initiale, à droite la seule configuration possible.
 -----------------------------------------------------------------
 ```
 
-Il n’y a qu’une possibilité car l’île sur laquelle on se trouve ne peut pas créer de pont avec le 1 de droite.
+Il n’y a qu’une possibilité car l’île sur laquelle on se trouve ne peut pas
+créer de pont avec le 1 de droite.
 
 ## 2.2 Création des grilles
 
@@ -108,7 +111,8 @@ Le fonctionnement de l'algorithme principal est le suivant : on crée une
 liste de nouvelles grilles à partir des ponts possibles de l'île courante.
 Puis, pour chacune de ces grilles, on teste si toutes les îles sont complétées,
 et si le graphe décrit par la grille est un graphe connexe. Si c'est le cas,
-la grille est solution. Sinon on déplace le curseur dans le sens de lecture vers la prochaine île et on recommence à créer de nouvelles grilles. Cet
+la grille est solution. Sinon on déplace le curseur dans le sens de lecture
+vers la prochaine île et on recommence à créer de nouvelles grilles. Cet
 algorithme s'apparente à un parcours en largeur.
 
 La méthode `Grid.solve()` implémente cet algorithme à l'aide d'une file qui
@@ -142,7 +146,8 @@ Fonction TrouverSolution(G):
 
 Pour améliorer le temps de résolution d'une grille, nous avons utilisé un
 autre algorithme en amont, qui diminue la charge de travail de l'algorithme
-principal. Cet algorithme consiste à trouver les îles pour lesquelles l'ensemble des ponts possibles est réduit à un. Ce sont les ponts dont
+principal. Cet algorithme consiste à trouver les îles pour lesquelles
+l'ensemble des ponts possibles est réduit à un. Ce sont les ponts dont
 l'emplacement est déterminé par les îles uniquement. Par exemple, une île ne
 reliant qu’un seul pont et qui ne possède qu’une seule île voisine est obligé
 d’être reliée à cette dernière par un pont unique.
@@ -160,14 +165,15 @@ passés de 43 à 39 minutes.
 chaque nouvelles grilles créées par l'algorithme principal. En effet, la
 complexité temporelle de ce dernier est telle, comparée au gain potentiel,
 qu'il n'est pas intéressant de l'appliquer à chaque nouvelle itération
-car la probabilité de rencontrer une grille sur laquelle l'algorithme de pré-résolution n'a aucun effet est très élevée.
+car la probabilité de rencontrer une grille sur laquelle l'algorithme de
+pré-résolution n'a aucun effet est très élevée.
 
 # Difficultés rencontrées et pistes d'améliorations
 
 Le choix de la structure de données qui représente une grille a été un réel
 défi lors de la réalisation du projet. La difficulté majeure fût de trouver
 une structure qui permet de gérer efficacement la notion de pont. C'est en
-élaborant l'algorithme que nous avons réussi à déterminer de quels données
+élaborant l'algorithme que nous avons réussi à déterminer de quelles données
 nous aurions besoin et comment les organiser.
 
 Dans un espoir d'améliorer la vitesse d'exécution, nous avons essayé
@@ -175,6 +181,7 @@ de paralléliser le processus en utilisant des threads. L'idée est la suivante 
 les threads défilent la file de grilles précédemment crées et travaillent à la
 création de nouvelles grilles chacun de leur côté. Malheureusement,
 l'implémentation de cette parallélisation n'a eu, au mieux, aucun effet,
-au pire, a grandement allongé les temps d'exécution. Nous pensons manquer de maîtrise par rapport aux threads Python, et il nous aurait fallu plus de temps
+au pire, a grandement allongé les temps d'exécution. Nous pensons manquer de
+maîtrise par rapport aux threads Python, et il nous aurait fallu plus de temps
 pour mieux approfondir le sujet.
 
