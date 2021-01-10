@@ -306,6 +306,7 @@ class Grid:
             if n == 2:
                 self.getCell(c).setDual()
 
+    # Renvoie la grille avec les ponts obligatoires.
     def __presolve(self):
         hasChange = True
         while hasChange:
