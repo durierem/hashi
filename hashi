@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
+import time
 
 from lib.gridLoader import GridLoader
 
@@ -14,16 +15,18 @@ def main():
         grid = GridLoader.load(arg)
 
         print("Trying to solve: " + arg + "...\n")
-        # grid.displayMatrix()
-        # print("")
 
+        start = time.time()
         solution = grid.solve()
+        end = time.time()
+        total = round(end - start, 2)
+
         if solution == False:
             print("No Island in the Grid.")
         elif solution == None:
-            print("No solution found.")
+            print(f"No solution found ({total} sec).")
         else:
-            print("A great result, here is:\n")
+            print(f"A great result, here is ({total} sec):\n")
             solution.display()
             print("")
 

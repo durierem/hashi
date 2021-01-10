@@ -3,8 +3,8 @@ lang: fr-FR
 title: hashi
 subtitle: Solveur de Hashiwokakero
 author:
-    - Rémi Durieu
     - Thomas Evrard
+    - Rémi Durieu
     - Kaci Hammoudi
 date: Janvier 2020
 documentclass: report
@@ -19,7 +19,7 @@ monofont: CMU Typewriter Text Light
 Pour l'implémentation, nous avons choisi Python afin de nous affranchir
 des subtilités techniques liées aux langages C et Java. Le temps d'exécution
 du programme en est probablement impacté mais nous gagnons un niveau
-d'abstraction non-négligeable pour ce genre de projet.
+d'abstraction non-négligeable pour ce genre de projet à contrainte de temps.
 
 ## 1.1  Encodage des grilles
 
@@ -35,8 +35,8 @@ langages incorpore un module JSON dans sa bibliothèque standard.
 
 ## 1.2 Description des structures de données
 
-Pour cela nous avons décidé de représenter une grille de Hashiwokakero (classe
-`Grid`) par une liste Python bidimensionnelle de cellules (classe `Cell`).
+Nous avons décidé de représenter une grille de Hashiwokakero (classe`Grid`)
+par une liste Python bidimensionnelle de cellules (classe `Cell`).
 Chaque cellule contient soit une île, soit un ou plusieurs ponts, soit rien du
 tout.
 
@@ -102,16 +102,18 @@ les ponts possibles.
 
 ## 2.3 Algorithmes de résolutions
 
-### 2.3.1 Algorithmes principal
+### 2.3.1 Algorithme principal
 
 Le fonctionnement de l'algorithme principal est le suivant : on crée une
 liste de nouvelles grilles à partir des ponts possibles de l'île courante.
-Puis, pour chacune de ces grilles on teste si toutes les îles sont complètes,
+Puis, pour chacune de ces grilles, on teste si toutes les îles sont complétées,
 et si le graphe décrit par la grille est un graphe connexe. Si c'est le cas,
-la grille est solution. Sinon on déplace le curseur dans le sens de lecture vers la prochaine île et on recommence à créer de nouvelles grilles.
+la grille est solution. Sinon on déplace le curseur dans le sens de lecture vers la prochaine île et on recommence à créer de nouvelles grilles. Cet
+algorithme s'apparente à un parcours en largeur.
 
 La méthode `Grid.solve()` implémente cet algorithme à l'aide d'une file qui
-contient les grilles créées au fur et à mesure. En voici le pseudo-code :
+contient les grilles créées au fur et à mesure. Ci-dessous, le pseudo-code de
+la logique principale.
 
 ```
 Fonction TrouverSolution(G):
@@ -146,16 +148,19 @@ reliant qu’un seul pont et qui ne possède qu’une seule île voisine est obl
 d’être reliée à cette dernière par un pont unique.
 
 Cette méthode varie grandement en efficacité en fonction de la complexité de la
-grille à résoudre. Par exemple, la grille `grid-17-easy.json` fournie n'est composé que de ponts de ce genre et peut être résout avec cet algorithme
+grille à résoudre. Par exemple, la grille `grid-17-easy.json` fournie n'est
+composée que de ponts de ce genre et peut être résout avec cet algorithme
 uniquement. Sur notre machine de test, le temps de résolution est passé de 30 à
-4 secondes. À contrario, la grille `grid-17-hard.json` ne profite que très peu
-de cette pré-résolution et le gain de temps est très faible. Toujours sur notre
-machine de test nous sommes passés de 43 à 39 minutes.
+4 secondes en appliquant cet algorithme en premier. À contrario, la grille
+`grid-17-hard.json` ne profite que très peu de cette pré-résolution et le gain
+de temps est très faible. Toujours sur notre machine de test nous sommes
+passés de 43 à 39 minutes.
 
-À cause de cette inconsistance, il est inutile d'appliquer cet algorithme sur
+À cause de cette irrégularité, il est inutile d'appliquer cet algorithme sur
 chaque nouvelles grilles créées par l'algorithme principal. En effet, la
 complexité temporelle de ce dernier est telle, comparée au gain potentiel,
-qu'il n'est pas intéressant de l'appliquer à chaque nouvelle itération.
+qu'il n'est pas intéressant de l'appliquer à chaque nouvelle itération
+car la probabilité de rencontrer une grille sur laquelle l'algorithme de pré-résolution n'a aucun effet est très élevée.
 
 # Difficultés rencontrées et pistes d'améliorations
 
@@ -165,7 +170,11 @@ une structure qui permet de gérer efficacement la notion de pont. C'est en
 élaborant l'algorithme que nous avons réussi à déterminer de quels données
 nous aurions besoin et comment les organiser.
 
-Dans la même quête d'amélioration de la vitesse d'exécution, nous avons essayé
-de paralléliser le processus avec des threads.
+Dans un espoir d'améliorer la vitesse d'exécution, nous avons essayé
+de paralléliser le processus en utilisant des threads. L'idée est la suivante :
+les threads défilent la file de grilles précédemment crées et travaillent à la
+création de nouvelles grilles chacun de leur côté. Malheureusement,
+l'implémentation de cette parallélisation n'a eu, au mieux, aucun effet,
+au pire, a grandement allongé les temps d'exécution. Nous pensons manquer de maîtrise par rapport aux threads Python, et il nous aurait fallu plus de temps
+pour mieux approfondir le sujet.
 
-(...)

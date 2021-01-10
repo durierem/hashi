@@ -29,7 +29,7 @@ class Grid:
     # ÉNUMÉRATEUR
 
     # Une grille peut être énuméré au moyen d'un curseur qui la parcours de
-    # bas en haut et de gauche à droite.
+    # gauche à droite et de haut en bas.
     #
     # Exemple :
     #       for cursor in grid:
@@ -109,7 +109,7 @@ class Grid:
         # Réinitialise le curseur de la grille.
         self.getCursor().setCoord((0, 0))
 
-        # Si le graphe est complétée connexe, c'est une solution.
+        # Si le graphe est complété et connexe, c'est une solution.
         if not self.__hasNextIsland():
             if self.__isConnected():
                 return self
@@ -216,7 +216,7 @@ class Grid:
         if self.getIsland().isFull():
             return self.__goToNextIsland()
 
-    # Renvoie vrai une autre est présente dans le sens de lecture.
+    # Renvoie vrai une île non-complétée est présente dans le sens de lecture.
     def __hasNextIsland(self, cursor=None):
         c = copy.copy(cursor if cursor != None else self.getCursor())
         while True:
